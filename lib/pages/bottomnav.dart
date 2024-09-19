@@ -5,6 +5,7 @@ import 'package:hutech_cateen/pages/Profile.dart';
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/pages/setting.dart';
 import 'package:hutech_cateen/pages/shoppingcart.dart';
+import 'package:hutech_cateen/widget/support_color.dart';
 
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
@@ -40,7 +41,7 @@ class _BottomNavState extends State<BottomNav> {
           height: 65,
           backgroundColor: Colors.white,
           index: 2,
-          color: Color.fromARGB(255, 245, 177, 76),
+          color: ColorWidget.primaryColor(),
           animationDuration: Duration(milliseconds: 500),
           onTap: (int index) {
             setState(() {

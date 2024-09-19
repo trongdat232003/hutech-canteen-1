@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/services/apiCategory.dart';
+import 'package:hutech_cateen/services/apiProduct.dart';
+import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
 
 class Home extends StatefulWidget {
@@ -15,7 +18,42 @@ class _HomeState extends State<Home> {
     "images/rice.png",
     "images/snack.png"
   ];
-  List categoriesName = ["Đồ uống", "Món nước", "Món cơm", "Ăn vặt"];
+  List categoriesName = [];
+  List productsName = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchCategoriesFromApi();
+    fetchProductsFromApi();
+  }
+
+  void fetchCategoriesFromApi() async {
+    try {
+      ApiCategoryService apiService = ApiCategoryService();
+      List<dynamic> fetchedCategories = await apiService.getCategories();
+
+      setState(() {
+        categoriesName =
+            fetchedCategories.map((category) => category['meals']).toList();
+      });
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
+  }
+
+  void fetchProductsFromApi() async {
+    try {
+      ApiProduct apiService = ApiProduct();
+      List<dynamic> fetchedProducts = await apiService.getProducts();
+      print(fetchedProducts);
+      setState(() {
+        productsName =
+            fetchedProducts.map((product) => product['product_name']).toList();
+      });
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +139,7 @@ class _HomeState extends State<Home> {
                   margin: EdgeInsets.only(right: 15),
                   padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 245, 177, 76),
+                    color: ColorWidget.primaryColor(),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -179,89 +217,16 @@ class _HomeState extends State<Home> {
             Container(
               margin: EdgeInsets.only(left: 10),
               height: 140,
-              child: ListView(
-                clipBehavior: Clip.none,
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                children: [
-                  for (var i = 0; i < 3; i++)
-                    Container(
-                      width: 160,
-                      margin: EdgeInsets.only(right: 15),
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                Colors.grey.withOpacity(0.1), // Màu của bóng đổ
-                            spreadRadius: 8, // Bán kính lan tỏa của bóng
-                            blurRadius: 18, // Bán kính mờ của bóng
-
-                            offset: Offset(
-                                10, 10), // Độ lệch của bóng (trục x, trục y)
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            top: -60,
-                            right: 30,
-                            child: Image.asset(
-                              "images/rice.png",
-                              height: 100,
-                              width: 100,
-                            ),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 30),
-                              Text(
-                                'Bánh tráng trộn',
-                                style: AppWidget.boldTextMediumFieldStyle(),
-                              ),
-                              SizedBox(height: 6),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '70 VNĐ',
-                                    style:
-                                        AppWidget.semiboldSmallTextFieldStyle(),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      minimumSize: Size(24, 24),
-                                      shape: CircleBorder(),
-                                      backgroundColor: Color.fromARGB(255, 245,
-                                          177, 76), // <-- Button color
-                                      foregroundColor:
-                                          Colors.red, // <-- Splash color
-                                    ),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+              child: ListView.builder(
+                  clipBehavior: Clip.none,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return ProductTile(
+                      image: 'images/rice.png',
+                      title: productsName[index],
+                    );
+                  }),
             )
           ],
         ),
@@ -325,6 +290,86 @@ class CategoryTile extends StatelessWidget {
             title,
             style: AppWidget.boldTextSmallFieldStyle(),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class ProductTile extends StatelessWidget {
+  String image;
+  String title;
+  ProductTile({required this.image, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 160,
+      margin: EdgeInsets.only(right: 15),
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1), // Màu của bóng đổ
+            spreadRadius: 8, // Bán kính lan tỏa của bóng
+            blurRadius: 18, // Bán kính mờ của bóng
+
+            offset: Offset(10, 10), // Độ lệch của bóng (trục x, trục y)
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            top: -60,
+            right: 30,
+            child: Image.asset(
+              "images/rice.png",
+              height: 100,
+              width: 100,
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 30),
+              Text(
+                title,
+                style: AppWidget.boldTextMediumFieldStyle(),
+              ),
+              SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '70 VNĐ',
+                    style: AppWidget.semiboldSmallTextFieldStyle(),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(24, 24),
+                      shape: CircleBorder(),
+                      backgroundColor:
+                          ColorWidget.primaryColor(), // <-- Button color
+                      foregroundColor: Colors.red, // <-- Splash color
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
         ],
       ),
     );

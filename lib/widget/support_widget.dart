@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/widget/support_color.dart';
 
 class AppWidget {
   static TextStyle boldTextLargeFieldStyle() {
@@ -28,7 +29,7 @@ class AppWidget {
 
   static TextStyle semiboldSmallTextFieldStyle() {
     return TextStyle(
-        color: Color.fromARGB(255, 245, 177, 76),
+        color: ColorWidget.primaryColor(),
         fontWeight: FontWeight.w500,
         fontSize: 14);
   }
