@@ -5,7 +5,7 @@ class ApiProduct {
   Future<List<dynamic>> getProducts() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/v2/api/product/all'),
+        Uri.parse('http://10.0.2.2:3000/v2/api/product/all'),
       );
 
       if (response.statusCode == 200) {
@@ -14,7 +14,28 @@ class ApiProduct {
         print(products);
         return products; // Trả về data từ API
       } else {
-        throw Exception('Failed to load categories');
+        throw Exception('Failed to load Product');
+      }
+    } catch (e) {
+      print('Error fetching Product: $e');
+      return []; // Trả về danh sách rỗng nếu xảy ra lỗi
+    }
+  }
+
+  Future<List<dynamic>> getProductsBySubCategoryID(subCategoryID) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://10.0.2.2:3000/v2/api/product/subcategory/$subCategoryID'),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var products = data['metaData'];
+        print(products);
+        return products; // Trả về data từ API
+      } else {
+        throw Exception('Failed to load Product');
       }
     } catch (e) {
       print('Error fetching categories: $e');

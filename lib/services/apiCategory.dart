@@ -5,12 +5,13 @@ class ApiCategoryService {
   Future<List<dynamic>> getCategories() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/v2/api/category/listPublish'),
+        Uri.parse('http://10.0.2.2:3000/v2/api/category/listPublish'),
       );
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var categories = data['metaData'];
+        print(categories);
         return categories; // Trả về data từ API
       } else {
         throw Exception('Failed to load categories');

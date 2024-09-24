@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/Components/CategoryItem.dart';
+import 'package:hutech_cateen/Components/ProductItem.dart';
+import 'package:hutech_cateen/pages/CategoriesDetail.dart';
 import 'package:hutech_cateen/services/apiCategory.dart';
 import 'package:hutech_cateen/services/apiProduct.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
@@ -12,14 +15,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List categories = [
+  List categoriesImage = [
     "images/drink.png",
     "images/noodle.png",
-    "images/rice.png",
+    "images/rice.jpg",
     "images/snack.png"
   ];
   List categoriesName = [];
+  List categoriesID = [];
   List productsName = [];
+
   @override
   void initState() {
     super.initState();
@@ -31,10 +36,13 @@ class _HomeState extends State<Home> {
     try {
       ApiCategoryService apiService = ApiCategoryService();
       List<dynamic> fetchedCategories = await apiService.getCategories();
+      print(fetchedCategories);
 
       setState(() {
         categoriesName =
             fetchedCategories.map((category) => category['meals']).toList();
+        categoriesID =
+            fetchedCategories.map((category) => category['_id']).toList();
       });
     } catch (e) {
       print('Error fetching categories: $e');
@@ -45,7 +53,7 @@ class _HomeState extends State<Home> {
     try {
       ApiProduct apiService = ApiProduct();
       List<dynamic> fetchedProducts = await apiService.getProducts();
-      print(fetchedProducts);
+
       setState(() {
         productsName =
             fetchedProducts.map((product) => product['product_name']).toList();
@@ -160,8 +168,7 @@ class _HomeState extends State<Home> {
                             shape: BoxShape.circle, color: Colors.white),
                         child: CircleAvatar(
                           backgroundColor: Colors.transparent,
-                          child: Image.asset(
-                              'images/food.png'), // Để màu nền của CircleAvatar trong suốt
+                          child: Image.asset('images/food.png'),
                         ),
                       ),
                       SizedBox(width: 10),
@@ -174,18 +181,21 @@ class _HomeState extends State<Home> {
                 ),
                 Expanded(
                   child: Container(
-                    height: 90,
-                    child: ListView.builder(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        itemCount: categories.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return CategoryTile(
-                            image: categories[index],
-                            title: categoriesName[index],
-                          );
-                        }),
+                    height: 80,
+                    child: (categoriesName.isNotEmpty)
+                        ? ListView.builder(
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                            itemCount: categoriesImage.length,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              return CategoryItem(
+                                image: categoriesImage[index],
+                                title: categoriesName[index],
+                                categoryID: categoriesID[index],
+                              );
+                            })
+                        : Center(child: Text("No categories available")),
                   ),
                 ),
               ],
@@ -216,161 +226,23 @@ class _HomeState extends State<Home> {
             SizedBox(height: 80),
             Container(
               margin: EdgeInsets.only(left: 10),
-              height: 140,
-              child: ListView.builder(
-                  clipBehavior: Clip.none,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return ProductTile(
-                      image: 'images/rice.png',
-                      title: productsName[index],
-                    );
-                  }),
+              height: 130,
+              child: (productsName.isNotEmpty)
+                  ? ListView.builder(
+                      clipBehavior: Clip.none,
+                      shrinkWrap: true,
+                      itemCount: productsName.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return ProductItem(
+                          image: 'images/pho.png',
+                          title: productsName[index],
+                        );
+                      })
+                  : Center(child: Text("No products available")),
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CategoryTile extends StatelessWidget {
-  String image;
-  String title;
-  CategoryTile({required this.image, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      margin: EdgeInsets.only(right: 15),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1), // Màu của bóng đổ
-            spreadRadius: 1, // Bán kính lan tỏa của bóng
-            blurRadius: 16, // Bán kính mờ của bóng
-
-            offset: Offset(8, 8), // Độ lệch của bóng (trục x, trục y)
-          ),
-        ],
-      ),
-      width: 148,
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromARGB(255, 253, 236, 192), // Màu của bóng đổ
-                  spreadRadius: 0.1, // Tỏa rộng bóng
-                  blurRadius: 10, // Độ mềm mại của bóng
-                  offset: Offset(0, 3), // Độ lệch của bóng (trục x, trục y)
-                ),
-              ],
-            ),
-            child: CircleAvatar(
-              backgroundColor:
-                  Colors.transparent, // Để màu nền của CircleAvatar trong suốt
-              child: Image.asset(
-                image,
-                height: 35,
-                width: 35,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SizedBox(width: 10),
-          Text(
-            title,
-            style: AppWidget.boldTextSmallFieldStyle(),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class ProductTile extends StatelessWidget {
-  String image;
-  String title;
-  ProductTile({required this.image, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 160,
-      margin: EdgeInsets.only(right: 15),
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1), // Màu của bóng đổ
-            spreadRadius: 8, // Bán kính lan tỏa của bóng
-            blurRadius: 18, // Bán kính mờ của bóng
-
-            offset: Offset(10, 10), // Độ lệch của bóng (trục x, trục y)
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            top: -60,
-            right: 30,
-            child: Image.asset(
-              "images/rice.png",
-              height: 100,
-              width: 100,
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 30),
-              Text(
-                title,
-                style: AppWidget.boldTextMediumFieldStyle(),
-              ),
-              SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    '70 VNĐ',
-                    style: AppWidget.semiboldSmallTextFieldStyle(),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(24, 24),
-                      shape: CircleBorder(),
-                      backgroundColor:
-                          ColorWidget.primaryColor(), // <-- Button color
-                      foregroundColor: Colors.red, // <-- Splash color
-                    ),
-                  )
-                ],
-              )
-            ],
-          ),
-        ],
       ),
     );
   }
