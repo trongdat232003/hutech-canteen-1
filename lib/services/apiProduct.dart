@@ -11,7 +11,7 @@ class ApiProduct {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var products = data['metaData'];
-        print(products);
+
         return products; // Trả về data từ API
       } else {
         throw Exception('Failed to load Product');
@@ -19,6 +19,27 @@ class ApiProduct {
     } catch (e) {
       print('Error fetching Product: $e');
       return []; // Trả về danh sách rỗng nếu xảy ra lỗi
+    }
+  }
+
+  Future<Map<String, dynamic>> getProductByID(productID) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:3000/v2/api/product/find/$productID'),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var product = data['metaData']['product'];
+        print(product);
+        return product; // Trả về data từ API
+      } else {
+        throw Exception('Failed to load Product');
+      }
+    } catch (e) {
+      print('Error fetching Product: $e');
+      return {};
+      // Trả về danh sách rỗng nếu xảy ra lỗi
     }
   }
 
@@ -32,7 +53,7 @@ class ApiProduct {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var products = data['metaData'];
-        print(products);
+
         return products; // Trả về data từ API
       } else {
         throw Exception('Failed to load Product');

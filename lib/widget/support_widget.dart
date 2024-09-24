@@ -33,4 +33,21 @@ class AppWidget {
         fontWeight: FontWeight.w500,
         fontSize: 14);
   }
+
+  static TextStyle descripe() {
+    return TextStyle(
+      color: Colors.grey[500],
+      fontSize: 16,
+    );
+  }
+
+  static TextStyle descripeStrong() {
+    return TextStyle(
+        color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.bold);
+  }
+
+  static TextStyle titleAppBar() {
+    return TextStyle(
+        color: Colors.grey[800], fontSize: 22, fontWeight: FontWeight.w600);
+  }
 }

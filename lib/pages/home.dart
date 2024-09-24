@@ -21,9 +21,9 @@ class _HomeState extends State<Home> {
     "images/rice.jpg",
     "images/snack.png"
   ];
-  List categoriesName = [];
-  List categoriesID = [];
-  List productsName = [];
+  List categories = [];
+  // List categoriesID = [];
+  List products = [];
 
   @override
   void initState() {
@@ -36,13 +36,12 @@ class _HomeState extends State<Home> {
     try {
       ApiCategoryService apiService = ApiCategoryService();
       List<dynamic> fetchedCategories = await apiService.getCategories();
-      print(fetchedCategories);
 
       setState(() {
-        categoriesName =
-            fetchedCategories.map((category) => category['meals']).toList();
-        categoriesID =
-            fetchedCategories.map((category) => category['_id']).toList();
+        categories = fetchedCategories
+            .map((category) =>
+                {'meal': category['meals'], 'id': category['_id']})
+            .toList();
       });
     } catch (e) {
       print('Error fetching categories: $e');
@@ -55,8 +54,12 @@ class _HomeState extends State<Home> {
       List<dynamic> fetchedProducts = await apiService.getProducts();
 
       setState(() {
-        productsName =
-            fetchedProducts.map((product) => product['product_name']).toList();
+        products = fetchedProducts
+            .map((product) => {
+                  'productName': product['product_name'],
+                  'productID': product['_id']
+                })
+            .toList();
       });
     } catch (e) {
       print('Error fetching categories: $e');
@@ -182,7 +185,7 @@ class _HomeState extends State<Home> {
                 Expanded(
                   child: Container(
                     height: 80,
-                    child: (categoriesName.isNotEmpty)
+                    child: (categories.isNotEmpty)
                         ? ListView.builder(
                             padding: EdgeInsets.only(top: 10, bottom: 10),
                             itemCount: categoriesImage.length,
@@ -191,8 +194,8 @@ class _HomeState extends State<Home> {
                             itemBuilder: (context, index) {
                               return CategoryItem(
                                 image: categoriesImage[index],
-                                title: categoriesName[index],
-                                categoryID: categoriesID[index],
+                                title: categories[index]['meal'],
+                                categoryID: categories[index]['id'],
                               );
                             })
                         : Center(child: Text("No categories available")),
@@ -227,16 +230,18 @@ class _HomeState extends State<Home> {
             Container(
               margin: EdgeInsets.only(left: 10),
               height: 130,
-              child: (productsName.isNotEmpty)
+              child: (products.isNotEmpty)
                   ? ListView.builder(
                       clipBehavior: Clip.none,
                       shrinkWrap: true,
-                      itemCount: productsName.length,
+                      itemCount: products.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         return ProductItem(
                           image: 'images/pho.png',
-                          title: productsName[index],
+                          title: products[index]['productName'],
+                          productID: products[index]['productID'],
+                          // Hardcode category ID for testing purpose
                         );
                       })
                   : Center(child: Text("No products available")),

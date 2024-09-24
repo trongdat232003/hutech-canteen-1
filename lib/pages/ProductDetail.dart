@@ -1,0 +1,261 @@
+import 'package:hutech_cateen/utils/helpers.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:hutech_cateen/services/apiProduct.dart';
+import 'package:hutech_cateen/widget/support_color.dart';
+import 'package:hutech_cateen/widget/support_widget.dart';
+
+class ProductDetail extends StatefulWidget {
+  final String productID;
+  const ProductDetail({required this.productID});
+
+  @override
+  State<ProductDetail> createState() => _ProductDetailState();
+}
+
+class _ProductDetailState extends State<ProductDetail> {
+  var product;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    fetchProductByID(widget.productID);
+  }
+
+  void fetchProductByID(String productID) async {
+    try {
+      ApiProduct apiService = ApiProduct();
+      var fetchedProduct = await apiService.getProductByID(productID);
+
+      if (fetchedProduct == null) {
+        throw Exception('Product not found');
+      }
+      setState(() {
+        product = fetchedProduct;
+      });
+    } catch (e) {
+      print('Error fetching subCategories: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return product != null
+        ? Scaffold(
+            backgroundColor: Colors.white,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(50.0),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back_ios, color: Colors.grey[800]),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  title: Text(
+                    "Details",
+                    style: AppWidget.titleAppBar(),
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: Icon(Icons.favorite_border,
+                          color: ColorWidget.primaryColor()),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            body: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 20,
+                      right: 25,
+                      left: 25,
+                      bottom: 80), // Thay đổi padding dưới để tránh che khuất
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 200,
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: ColorWidget.primaryColor(),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        child: Image.asset(
+                          'images/pho.png', // Thay thế bằng hình ảnh của bạn
+                          height: 180,
+                          width: 180,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            product!['product_name'],
+                            style: AppWidget.boldTextLargeFieldStyle(),
+                          ),
+                          Row(
+                            children: [
+                              Text(product!['product_ratingAverage'].toString(),
+                                  style: AppWidget.boldTextSmallFieldStyle()),
+                              SizedBox(width: 4),
+                              Icon(Icons.star, color: Colors.orange, size: 20),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        product!['product_description'],
+                        style: AppWidget.descripe(),
+                      ),
+                      SizedBox(height: 10),
+                      Row(children: [
+                        Text(
+                          "SIZE:",
+                          style: AppWidget.boldTextMediumFieldStyle(),
+                        ),
+                        SizedBox(width: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: ColorWidget.inputColor(),
+                              borderRadius: BorderRadius.circular(30)),
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            product!['serving_size'],
+                            style: AppWidget.descripeStrong(),
+                          ),
+                        ),
+                      ]),
+                      SizedBox(height: 10),
+                      Text(
+                        "Cách sử dụng :",
+                        style: AppWidget.boldTextMediumFieldStyle(),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        product!['product_usage'],
+                        style: AppWidget.descripe(),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        "Nguyên Liệu :",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(product!['ingredients'],
+                          style: AppWidget.descripe()),
+                      Spacer(),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: ColorWidget.inputColor(),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(30))),
+                    padding: EdgeInsets.only(
+                        right: 24,
+                        left: 24,
+                        bottom: 40,
+                        top: 30), // Padding cho nội dung bên trong
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              Helpers.formatPrice(product!['product_price']),
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            _quantityControl(context),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorWidget.primaryColor(),
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              "ADD TO CART",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Scaffold(
+            body: Center(
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: Colors.black,
+                size: 100,
+              ),
+            ),
+          );
+  }
+
+  Widget _quantityControl(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.remove, color: Colors.white),
+            onPressed: () {},
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              "2",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.add, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}

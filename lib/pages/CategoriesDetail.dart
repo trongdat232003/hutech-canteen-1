@@ -58,7 +58,8 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
         products = fetchProducts
             .map((product) => {
                   'productName': product['product_name'],
-                  'productImage': product['product_thumb']
+                  'productImage': product['product_thumb'],
+                  'productID': product['_id']
                 })
             .toList();
       });
@@ -181,7 +182,8 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                   itemBuilder: (context, index) {
                     return ProductItem(
                         image: 'images/pho.png',
-                        title: products[index]['productName']);
+                        title: products[index]['productName'],
+                        productID: products[index]['productID']);
                   }),
             )
           ],
