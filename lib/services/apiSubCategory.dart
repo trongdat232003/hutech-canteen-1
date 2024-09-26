@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiSubCategoryService {
+  String baseUrl = 'http://localhost:3000/v2/api/category';
   Future<List<dynamic>> getSubCategoriesByCategoryID(categoryID) async {
     try {
       final response = await http.get(
-        Uri.parse(
-            'http://10.0.2.2:3000/v2/api/category/getSubCategories/$categoryID'),
+        Uri.parse('$baseUrl/getSubCategories/$categoryID'),
       );
 
       if (response.statusCode == 200) {

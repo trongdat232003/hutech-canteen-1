@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiProduct {
+  String baseUrl = 'http://localhost:3000/v2/api/product';
   Future<List<dynamic>> getProducts() async {
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:3000/v2/api/product/all'),
+        Uri.parse('$baseUrl/all'),
       );
 
       if (response.statusCode == 200) {
@@ -25,7 +26,7 @@ class ApiProduct {
   Future<Map<String, dynamic>> getProductByID(productID) async {
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:3000/v2/api/product/find/$productID'),
+        Uri.parse('$baseUrl/find/$productID'),
       );
 
       if (response.statusCode == 200) {
@@ -46,8 +47,7 @@ class ApiProduct {
   Future<List<dynamic>> getProductsBySubCategoryID(subCategoryID) async {
     try {
       final response = await http.get(
-        Uri.parse(
-            'http://10.0.2.2:3000/v2/api/product/subcategory/$subCategoryID'),
+        Uri.parse('$baseUrl/subcategory/$subCategoryID'),
       );
 
       if (response.statusCode == 200) {

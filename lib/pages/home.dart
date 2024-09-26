@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/Components/CategoryItem.dart';
 import 'package:hutech_cateen/Components/ProductItem.dart';
+import 'package:hutech_cateen/Components/_search.dart';
+import 'package:hutech_cateen/Components/info_user.dart';
+import 'package:hutech_cateen/Components/row_title.dart';
 import 'package:hutech_cateen/pages/CategoriesDetail.dart';
 import 'package:hutech_cateen/services/apiCategory.dart';
 import 'package:hutech_cateen/services/apiProduct.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,12 +28,13 @@ class _HomeState extends State<Home> {
     "images/snack.png"
   ];
   List categories = [];
-  // List categoriesID = [];
   List products = [];
+  String userName = '';
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
     fetchCategoriesFromApi();
     fetchProductsFromApi();
   }
@@ -66,6 +73,17 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? metaData = prefs.getString('metaData');
+    if (metaData != null) {
+      var user = jsonDecode(metaData)['user'];
+      setState(() {
+        userName = user['name'];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,71 +93,15 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Hey, Shivam,",
-                        style: AppWidget.boldTextLargeFieldStyle()),
-                    Text(
-                      "Good morning!",
-                      style: AppWidget.lightTextFieldStyle(),
-                    )
-                  ],
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    "images/user.jpg",
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
+            InfoUser(userName: userName),
             SizedBox(
               height: 30,
             ),
-            Container(
-              padding: EdgeInsets.only(right: 20),
-              decoration: BoxDecoration(
-                  color: const Color.fromARGB(31, 212, 200, 200),
-                  borderRadius: BorderRadius.circular(10)),
-              width: MediaQuery.of(context).size.width,
-              child: TextField(
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Search Products",
-                    hintStyle: AppWidget.lightTextFieldStyle(),
-                    prefixIcon: Icon(Icons.search)),
-              ),
-            ),
+            Search(),
             SizedBox(
               height: 30,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'All Categories',
-                  style: AppWidget.semiboldTextFieldStyle(),
-                ),
-                Row(
-                  children: [
-                    Text('See All', style: AppWidget.lightTextFieldStyle()),
-                    SizedBox(width: 6),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 18,
-                      color: Colors.black45,
-                    )
-                  ],
-                )
-              ],
-            ),
+            RowTitle(title: 'All Categories'),
             SizedBox(
               height: 15,
             ),
@@ -206,26 +168,7 @@ class _HomeState extends State<Home> {
             SizedBox(
               height: 20,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'All Products',
-                  style: AppWidget.semiboldTextFieldStyle(),
-                ),
-                Row(
-                  children: [
-                    Text('See All', style: AppWidget.lightTextFieldStyle()),
-                    SizedBox(width: 6),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 18,
-                      color: Colors.black45,
-                    )
-                  ],
-                )
-              ],
-            ),
+            RowTitle(title: 'All Products'),
             SizedBox(height: 80),
             Container(
               margin: EdgeInsets.only(left: 10),

@@ -39,7 +39,10 @@ dependencies:
     curved_navigation_bar: ^1.0.6
     shimmer: ^3.0.0
     http: ^1.2.2
+    fluttertoast: ^8.2.8
+    pin_code_fields: ^8.0.1
     currency_formatter: ^2.2.0
+    shared_preferences: ^2.3.2
 
 dev_dependencies:
     flutter_test:
@@ -74,6 +77,10 @@ flutter:
         - images/comtam.png
         - images/nuocdau.png
         - images/pho.png
+        - images/logo_hutech.png
+        - images/twitter_logo.webp
+        - images/facebook_logo.png
+        - images/apple_logo.jpg
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
