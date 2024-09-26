@@ -1,3 +1,6 @@
+import 'package:hutech_cateen/Components/quantity_control.dart';
+import 'package:hutech_cateen/pages/shopping_cart.dart';
+import 'package:hutech_cateen/services/api_shopping_cart.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +18,17 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetailState extends State<ProductDetail> {
   var product;
-
+  var selectedQuantity = 1;
   @override
   void initState() {
     // TODO: implement initState
     fetchProductByID(widget.productID);
+  }
+
+  void updateQuantity(int quantity) {
+    setState(() {
+      selectedQuantity = quantity;
+    });
   }
 
   void fetchProductByID(String productID) async {
@@ -35,6 +44,22 @@ class _ProductDetailState extends State<ProductDetail> {
       });
     } catch (e) {
       print('Error fetching subCategories: $e');
+    }
+  }
+
+  void fetchAddToCart(String productID, int selectedQuantity) async {
+    try {
+      ApiShoppingCart apiService = ApiShoppingCart();
+      await apiService.addToCart(productID, selectedQuantity);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ShoppingCart()),
+      );
+    } catch (e) {
+      print('Error fetching subCategories: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding to cart: $e')),
+      );
     }
   }
 
@@ -190,14 +215,19 @@ class _ProductDetailState extends State<ProductDetail> {
                                 color: Colors.grey[800],
                               ),
                             ),
-                            _quantityControl(context),
+                            QuantityControl(
+                                quantity: selectedQuantity,
+                                onQuantityChanged: updateQuantity),
                           ],
                         ),
                         SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              fetchAddToCart(
+                                  widget.productID, selectedQuantity);
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ColorWidget.primaryColor(),
                               padding: EdgeInsets.symmetric(vertical: 16),
@@ -229,33 +259,5 @@ class _ProductDetailState extends State<ProductDetail> {
               ),
             ),
           );
-  }
-
-  Widget _quantityControl(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[800],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: Icon(Icons.remove, color: Colors.white),
-            onPressed: () {},
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              "2",
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
   }
 }

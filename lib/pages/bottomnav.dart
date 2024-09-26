@@ -4,7 +4,7 @@ import 'package:hutech_cateen/pages/Order.dart';
 import 'package:hutech_cateen/pages/Profile.dart';
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/pages/setting.dart';
-import 'package:hutech_cateen/pages/shoppingcart.dart';
+import 'package:hutech_cateen/pages/shopping_cart.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 
 class BottomNav extends StatefulWidget {
