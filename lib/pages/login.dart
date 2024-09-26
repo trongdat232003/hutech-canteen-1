@@ -192,7 +192,9 @@ class _LoginState extends State<Login> {
                         ),
                         child: Text("Đăng nhập",
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
                       ),
                       SizedBox(height: 20),
                       Row(

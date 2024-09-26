@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
 
-class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({super.key});
+class ResetPassword extends StatefulWidget {
+  const ResetPassword({super.key});
 
   @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
+  State<ResetPassword> createState() => _ResetPasswordState();
 }
 
-class _ForgotPasswordState extends State<ForgotPassword> {
+class _ResetPasswordState extends State<ResetPassword> {
+  // Controllers để quản lý đầu vào từ các ô nhập mật khẩu
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  // Biến để kiểm tra tính hợp lệ của mật khẩu xác nhận
+  String? _errorMessage;
+
+  // Hàm kiểm tra nếu mật khẩu xác nhận giống mật khẩu mới
+  void _validatePasswords() {
+    setState(() {
+      if (_newPasswordController.text == _confirmPasswordController.text) {
+        _errorMessage = null; // Mật khẩu khớp
+      } else {
+        _errorMessage = "Passwords do not match"; // Mật khẩu không khớp
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           // Nền xanh chứa logo và tiêu đề
@@ -31,16 +50,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  "Forgot Password",
+                  "Reset Password",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Please sign in to your existing account",
-                  style: TextStyle(color: Colors.white),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -55,7 +70,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               color: Colors.white,
             ),
           ),
-          // Phần trắng chứa form nhập email
+          // Phần trắng chứa form nhập mật khẩu mới
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
@@ -74,23 +89,57 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "EMAIL",
+                      "NEW PASSWORD",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
+                      controller: _newPasswordController,
                       decoration: InputDecoration(
-                        labelText: "Enter your email",
+                        labelText: "Enter your new password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(9.0),
                         ),
                       ),
-                      keyboardType: TextInputType.emailAddress,
+                      obscureText: true,
                     ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "CONFIRM PASSWORD",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: _confirmPasswordController,
+                      decoration: InputDecoration(
+                        labelText: "Confirm your new password",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(9.0),
+                        ),
+                      ),
+                      obscureText: true,
+                      onChanged: (value) {
+                        _validatePasswords();
+                      },
+                    ),
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        // Xử lý logic khi bấm đăng nhập
+                        if (_newPasswordController.text ==
+                            _confirmPasswordController.text) {
+                          // Xử lý logic khi mật khẩu khớp
+                          // Ví dụ: Gửi mật khẩu mới lên server
+                        } else {
+                          _validatePasswords();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
