@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiProduct {
-  String baseUrl = 'http://localhost:3000/v2/api/product';
+  String baseUrl = 'http://10.0.2.2:3000/v2/api/product';
   Future<List<dynamic>> getProducts() async {
     try {
       final response = await http.get(

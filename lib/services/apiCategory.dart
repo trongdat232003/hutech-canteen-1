@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiCategoryService {
-  String baseUrl = 'http://localhost:3000/v2/api/category';
+  String baseUrl = 'http://10.0.2.2:3000/v2/api/category';
 
   Future<List<dynamic>> getCategories() async {
     try {

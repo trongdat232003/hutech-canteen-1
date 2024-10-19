@@ -1,17 +1,17 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/Components/CategoryItem.dart';
 import 'package:hutech_cateen/Components/ProductItem.dart';
 import 'package:hutech_cateen/Components/_search.dart';
 import 'package:hutech_cateen/Components/info_user.dart';
 import 'package:hutech_cateen/Components/row_title.dart';
-import 'package:hutech_cateen/pages/CategoriesDetail.dart';
+import 'package:hutech_cateen/pages/edit_profile.dart';
 import 'package:hutech_cateen/services/apiCategory.dart';
 import 'package:hutech_cateen/services/apiProduct.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -30,6 +30,7 @@ class _HomeState extends State<Home> {
   List categories = [];
   List products = [];
   String userName = '';
+  String avatarUrl = '';
 
   @override
   void initState() {
@@ -69,18 +70,48 @@ class _HomeState extends State<Home> {
             .toList();
       });
     } catch (e) {
-      print('Error fetching categories: $e');
+      print('Error fetching products: $e');
     }
   }
 
   void _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? metaData = prefs.getString('metaData');
-    if (metaData != null) {
-      var user = jsonDecode(metaData)['user'];
-      setState(() {
-        userName = user['name'];
-      });
+    String? token = prefs.getString('token'); // Retrieve the token
+
+    if (token != null) {
+      try {
+        // Make the API call to get user info
+        final response = await http.get(
+          Uri.parse('http://10.0.2.2:3000/v2/api/user/getUserInfo'),
+          headers: {
+            'Authorization': '$token', // Include the access token
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['status'] == 200) {
+            var user = responseData['metaData'];
+            // Update user info in state
+            setState(() {
+              userName = user['name'];
+              avatarUrl = user['avatar']
+                  .replaceAll(r'\', '/'); // Fix the avatar URL format
+              // Ensure to prefix with the base URL
+              avatarUrl = 'http://10.0.2.2:3000/$avatarUrl';
+            });
+          } else {
+            print("Error: ${responseData['message']}");
+          }
+        } else {
+          print(
+              "Failed to load user data, status code: ${response.statusCode}");
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    } else {
+      print("No token found in SharedPreferences.");
     }
   }
 
@@ -89,39 +120,51 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.only(top: 50, left: 20, right: 20),
+        margin: const EdgeInsets.only(top: 50, left: 20, right: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoUser(userName: userName),
-            SizedBox(
+            InfoUser(
+              userName: userName,
+              avatarUrl: avatarUrl.isNotEmpty
+                  ? avatarUrl // Ensure to include the full URL
+                  : 'images/user.jpg', // Handle empty URL case
+            ),
+            const SizedBox(
               height: 30,
             ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EditProfilePage()),
+                );
+              },
+              child: const Text('Chỉnh sửa hồ sơ'),
+            ),
             Search(),
-            SizedBox(
+            const SizedBox(
               height: 30,
             ),
             RowTitle(title: 'All Categories'),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Row(
               children: [
                 Container(
                   height: 70,
-                  margin: EdgeInsets.only(right: 15),
-                  padding: EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(right: 15),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: ColorWidget.primaryColor(),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1), // Màu của bóng đổ
-                        spreadRadius: 3, // Bán kính lan tỏa của bóng
-                        blurRadius: 10, // Bán kính mờ của bóng
-
-                        offset:
-                            Offset(12, 10), // Độ lệch của bóng (trục x, trục y)
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 3,
+                        blurRadius: 10,
+                        offset: const Offset(12, 10),
                       ),
                     ],
                   ),
@@ -129,14 +172,14 @@ class _HomeState extends State<Home> {
                   child: Row(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             shape: BoxShape.circle, color: Colors.white),
-                        child: CircleAvatar(
+                        child: const CircleAvatar(
                           backgroundColor: Colors.transparent,
-                          child: Image.asset('images/food.png'),
+                          child: Image(image: AssetImage('images/food.png')),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(
                         'All',
                         style: AppWidget.boldTextSmallFieldStyle(),
@@ -149,7 +192,7 @@ class _HomeState extends State<Home> {
                     height: 80,
                     child: (categories.isNotEmpty)
                         ? ListView.builder(
-                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                            padding: const EdgeInsets.only(top: 10, bottom: 10),
                             itemCount: categoriesImage.length,
                             shrinkWrap: true,
                             scrollDirection: Axis.horizontal,
@@ -160,18 +203,18 @@ class _HomeState extends State<Home> {
                                 categoryID: categories[index]['id'],
                               );
                             })
-                        : Center(child: Text("No categories available")),
+                        : const Center(child: Text("No categories available")),
                   ),
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             RowTitle(title: 'All Products'),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             Container(
-              margin: EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10),
               height: 130,
               child: (products.isNotEmpty)
                   ? ListView.builder(
@@ -184,11 +227,10 @@ class _HomeState extends State<Home> {
                           image: 'images/pho.png',
                           title: products[index]['productName'],
                           productID: products[index]['productID'],
-                          // Hardcode category ID for testing purpose
                         );
                       })
-                  : Center(child: Text("No products available")),
-            )
+                  : const Center(child: Text("No products available")),
+            ),
           ],
         ),
       ),

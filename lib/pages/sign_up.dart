@@ -23,7 +23,7 @@ class _SignUpState extends State<SignUp> {
   final ApiAuth _apiAuth = ApiAuth();
   void showSuccessToast() {
     Fluttertoast.showToast(
-      msg: "Login thành công!",
+      msg: "Đăng ký thành công!",
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP_RIGHT,
       backgroundColor: Colors.green,
@@ -48,7 +48,7 @@ class _SignUpState extends State<SignUp> {
       } else {
         // Hiển thị thông báo lỗi cho người dùng
         Fluttertoast.showToast(
-          msg: "Login thất bại!",
+          msg: "Đăng ký thất bại!",
           backgroundColor: Colors.red,
           textColor: Colors.white,
         );

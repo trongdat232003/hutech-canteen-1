@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+// Import class ApiAuth
+import 'package:hutech_cateen/services/apiAuth.dart';
+import 'reset_password.dart';
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -8,6 +11,39 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+  final TextEditingController _emailController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _loading = false;
+
+  // Hàm gửi yêu cầu mã đặt lại mật khẩu
+  Future<void> _sendResetCode() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _loading = true;
+      });
+
+      ApiAuth apiAuth = ApiAuth();
+      bool success = await apiAuth.forgotPassword(_emailController.text);
+
+      setState(() {
+        _loading = false;
+      });
+
+      if (success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPassword(email: _emailController.text),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to send reset code')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -17,7 +53,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Nền xanh chứa logo và tiêu đề
           Container(
             width: double.infinity,
             height: screenHeight / 2.5,
@@ -25,22 +60,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "images/logo_hutech.png",
-                  width: screenWidth / 3,
-                ),
+                Image.asset("images/logo_hutech.png", width: screenWidth / 3),
                 const SizedBox(height: 10),
                 const Text(
                   "Forgot Password",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Please sign in to your existing account",
-                  style: TextStyle(color: Colors.white),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -48,20 +76,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           Positioned(
             top: 40,
             left: 10,
-            child: BackButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              color: Colors.white,
-            ),
+            child: BackButton(color: Colors.white),
           ),
-          // Phần trắng chứa form nhập email
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
               child: Container(
                 height: screenHeight / 1.6,
-                width: screenWidth,
+                padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -69,45 +91,52 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "EMAIL",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: "Enter your email",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(9.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("EMAIL",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: "Enter your email",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9.0),
+                          ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Xử lý logic khi bấm đăng nhập
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _loading ? null : _sendResetCode,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
+                        child: _loading
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                "SUBMIT",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      child: const Text(
-                        "SUBMIT",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

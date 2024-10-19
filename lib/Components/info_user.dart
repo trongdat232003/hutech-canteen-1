@@ -1,16 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
 
-class InfoUser extends StatefulWidget {
+class InfoUser extends StatelessWidget {
   final String userName;
-  const InfoUser({required this.userName});
+  final String avatarUrl;
 
-  @override
-  State<InfoUser> createState() => _InfoUserState();
-}
+  const InfoUser({Key? key, required this.userName, required this.avatarUrl})
+      : super(key: key);
 
-class _InfoUserState extends State<InfoUser> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -19,22 +16,40 @@ class _InfoUserState extends State<InfoUser> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Hey, ${widget.userName}",
-                style: AppWidget.boldTextLargeFieldStyle()),
+            Text(
+              "Hey, ${userName}",
+              style: AppWidget.boldTextLargeFieldStyle(),
+            ),
             Text(
               "Good morning!",
               style: AppWidget.lightTextFieldStyle(),
-            )
+            ),
           ],
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            "images/user.jpg",
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
+          child: avatarUrl.isNotEmpty
+              ? Image.network(
+                  avatarUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Handle image loading error
+                    return Image.asset(
+                      "images/user.jpg",
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
+              : Image.asset(
+                  "images/user.jpg",
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
         ),
       ],
     );

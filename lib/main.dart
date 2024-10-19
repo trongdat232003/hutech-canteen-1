@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/pages/Order.dart';
 import 'package:hutech_cateen/pages/Profile.dart';
 import 'package:hutech_cateen/pages/bottomnav.dart';
 import 'package:hutech_cateen/pages/forgot_password.dart';
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/pages/login.dart';
+import 'package:hutech_cateen/pages/reset_password.dart';
 import 'package:hutech_cateen/pages/sign_up.dart';
 
 void main() {
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Profile(),
+      home: Login(),
     );
   }
 }

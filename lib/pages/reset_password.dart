@@ -1,42 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/services/apiAuth.dart'; // Import class ApiAuth
+import 'dart:async'; // Import thư viện Timer
 
 class ResetPassword extends StatefulWidget {
-  const ResetPassword({super.key});
+  final String email;
+
+  const ResetPassword({required this.email, Key? key}) : super(key: key);
 
   @override
   State<ResetPassword> createState() => _ResetPasswordState();
 }
 
 class _ResetPasswordState extends State<ResetPassword> {
-  // Controllers để quản lý đầu vào từ các ô nhập mật khẩu
+  final TextEditingController _resetCodeController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  // Biến để kiểm tra tính hợp lệ của mật khẩu xác nhận
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _loading = false;
   String? _errorMessage;
 
-  // Hàm kiểm tra nếu mật khẩu xác nhận giống mật khẩu mới
-  void _validatePasswords() {
-    setState(() {
-      if (_newPasswordController.text == _confirmPasswordController.text) {
-        _errorMessage = null; // Mật khẩu khớp
+  late Timer _timer;
+  int _remainingTime = 120; // 2 phút (120 giây)
+  bool _canResend = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _resetCodeController.dispose();
+    _newPasswordController.dispose();
+    _timer.cancel(); // Hủy bộ đếm khi màn hình được đóng
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_remainingTime > 0) {
+        setState(() {
+          _remainingTime--;
+        });
       } else {
-        _errorMessage = "Passwords do not match"; // Mật khẩu không khớp
+        setState(() {
+          _canResend = true; // Cho phép gửi lại mã
+          _timer.cancel();
+        });
       }
     });
+  }
+
+  Future<void> _resetPassword() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _loading = true;
+      });
+
+      ApiAuth apiAuth = ApiAuth();
+      bool success = await apiAuth.resetPassword(
+        widget.email,
+        _resetCodeController.text,
+        _newPasswordController.text,
+      );
+
+      setState(() {
+        _loading = false;
+      });
+
+      if (success) {
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Reset password failed')),
+        );
+      }
+    }
+  }
+
+  // Hàm để định dạng thời gian còn lại
+  String _formatTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // Nền xanh chứa logo và tiêu đề
           Container(
             width: double.infinity,
             height: screenHeight / 2.5,
@@ -44,10 +100,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "images/logo_hutech.png",
-                  width: screenWidth / 3,
-                ),
+                Image.asset("images/logo_hutech.png", width: 100),
                 const SizedBox(height: 10),
                 const Text(
                   "Reset Password",
@@ -63,20 +116,14 @@ class _ResetPasswordState extends State<ResetPassword> {
           Positioned(
             top: 40,
             left: 10,
-            child: BackButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              color: Colors.white,
-            ),
+            child: BackButton(color: Colors.white),
           ),
-          // Phần trắng chứa form nhập mật khẩu mới
           Align(
             alignment: Alignment.bottomCenter,
             child: SingleChildScrollView(
               child: Container(
                 height: screenHeight / 1.6,
-                width: screenWidth,
+                padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -84,79 +131,110 @@ class _ResetPasswordState extends State<ResetPassword> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "NEW PASSWORD",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      controller: _newPasswordController,
-                      decoration: InputDecoration(
-                        labelText: "Enter your new password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(9.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "RESET CODE",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _resetCodeController,
+                        decoration: InputDecoration(
+                          labelText: "Enter reset code",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9.0),
+                          ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the reset code';
+                          }
+                          return null;
+                        },
                       ),
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "CONFIRM PASSWORD",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      decoration: InputDecoration(
-                        labelText: "Confirm your new password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(9.0),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "NEW PASSWORD",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _newPasswordController,
+                        decoration: InputDecoration(
+                          labelText: "Enter your new password",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9.0),
+                          ),
                         ),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a new password';
+                          }
+                          return null;
+                        },
                       ),
-                      obscureText: true,
-                      onChanged: (value) {
-                        _validatePasswords();
-                      },
-                    ),
-                    if (_errorMessage != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(color: Colors.red),
+                      const SizedBox(height: 20),
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(_errorMessage!,
+                              style: const TextStyle(color: Colors.red)),
                         ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: _canResend
+                                ? () {
+                                    Navigator.pushNamed(
+                                        context, '/forgot-password');
+                                  }
+                                : null, // Chỉ cho phép nhấn nếu _canResend là true
+                            child: Text(
+                              "Resend Code",
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: _canResend
+                                    ? Colors.blue
+                                    : Colors
+                                        .grey, // Thay đổi màu tùy thuộc vào trạng thái _canResend
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(_formatTime(
+                              _remainingTime)), // Hiển thị thời gian
+                        ],
                       ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_newPasswordController.text ==
-                            _confirmPasswordController.text) {
-                          // Xử lý logic khi mật khẩu khớp
-                          // Ví dụ: Gửi mật khẩu mới lên server
-                        } else {
-                          _validatePasswords();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _loading ? null : _resetPassword,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
+                        child: _loading
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                "RESET PASSWORD",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      child: const Text(
-                        "SUBMIT",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
