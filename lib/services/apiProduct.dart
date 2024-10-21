@@ -28,7 +28,8 @@ class ApiProduct {
       final response = await http.get(
         Uri.parse('$baseUrl/find/$productID'),
       );
-
+      print(response);
+      print(productID);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var product = data['metaData']['product'];
