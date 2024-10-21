@@ -1,21 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:hutech_cateen/pages/Order.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hutech_cateen/pages/Profile.dart';
 import 'package:hutech_cateen/pages/bottomnav.dart';
 import 'package:hutech_cateen/pages/forgot_password.dart';
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/pages/login.dart';
-import 'package:hutech_cateen/pages/reset_password.dart';
 import 'package:hutech_cateen/pages/sign_up.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken =
+        prefs.getString('accessToken'); // Kiểm tra accessToken
+    setState(() {
+      _isLoggedIn =
+          accessToken != null; // Nếu accessToken tồn tại thì đã đăng nhập
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,7 +53,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Login(),
+      // Hiển thị BottomNav nếu đã đăng nhập, nếu không hiển thị Login
+      home: _isLoggedIn ? BottomNav() : const Login(),
     );
   }
 }

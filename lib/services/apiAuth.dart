@@ -31,6 +31,8 @@ class ApiAuth {
         prefs.setString(
             'token', metaData['token']['accessToken']); // Store token
         prefs.setString('metaData', jsonEncode(metaData));
+        prefs.setString('accessToken', metaData['token']['accessToken']);
+        prefs.setString('refreshToken', metaData['token']['refreshToken']);
         return metaData;
       } else {
         return null;
@@ -39,6 +41,12 @@ class ApiAuth {
       print('Error: $e');
       return null;
     }
+  }
+
+  Future<bool> isLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? accessToken = prefs.getString('accessToken');
+    return accessToken != null; // Trả về true nếu accessToken tồn tại
   }
 
   Future<bool> signUp(String name, String email, String password) async {
