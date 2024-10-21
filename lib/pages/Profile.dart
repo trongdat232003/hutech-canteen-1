@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hutech_cateen/pages/review_screen.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -145,28 +146,34 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              FeatherIcons.shoppingCart,
-                              color: Colors.blueAccent,
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReviewScreen()),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                FeatherIcons.star,
+                                color: Colors.blueAccent,
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Log out"),
-                          SizedBox(
-                            width: 190,
-                          ),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text("Đánh giá"),
+                            SizedBox(
+                              width: 190,
+                            ),
+                            Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,
