@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/services/apiAuth.dart';
@@ -33,18 +33,18 @@ class _LoginState extends State<Login> {
 
   final ApiAuth _apiAuth = ApiAuth();
 
-  void showSuccessToast() {
-    Fluttertoast.showToast(
-      msg: "Login thành công!",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP_RIGHT,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-      webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
-      webPosition: "topright",
-    );
-  }
+  // void showSuccessToast() {
+  //   Fluttertoast.showToast(
+  //     msg: "Login thành công!",
+  //     toastLength: Toast.LENGTH_LONG,
+  //     gravity: ToastGravity.TOP_RIGHT,
+  //     backgroundColor: Colors.green,
+  //     textColor: Colors.white,
+  //     fontSize: 16.0,
+  //     webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+  //     webPosition: "topright",
+  //   );
+  // }
 
   ///login
   void _login() async {
@@ -54,15 +54,16 @@ class _LoginState extends State<Login> {
 
       var metaData = await _apiAuth.login(email, password);
       if (metaData != null) {
-        showSuccessToast();
+        // showSuccessToast();
         Navigator.pushReplacementNamed(context, '/home', arguments: metaData);
-      } else {
-        Fluttertoast.showToast(
-          msg: "Login thất bại!",
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
       }
+      // else {
+      //   Fluttertoast.showToast(
+      //     msg: "Login thất bại!",
+      //     backgroundColor: Colors.red,
+      //     textColor: Colors.white,
+      //   );
+      // }
     }
   }
 

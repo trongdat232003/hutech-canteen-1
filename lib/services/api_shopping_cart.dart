@@ -25,8 +25,68 @@ class ApiShoppingCart {
         body: jsonEncode({'productId': productId, 'quantity': quantity}),
       );
     } catch (e) {
-      print('Error fetching categories: $e');
+      print('Error fetching cart: $e');
       return {}; // Trả về danh sách rỗng nếu xảy ra lỗi
+    }
+  }
+
+  Future<List<dynamic>> getShoppingCarts() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('metaData');
+      if (token == null) {
+        throw Exception('No token found. Please log in again.');
+      }
+      var metaData = jsonDecode(token);
+      var accessToken = metaData['token']['accessToken'];
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/getCartByUser'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': '$accessToken'
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        var carts = data['metaData']['cart_products'];
+        return carts;
+      } else {
+        throw Exception('Failed to load Cart');
+      }
+    } catch (e) {
+      print('Error fetching shopping cart: $e');
+      return [];
+    }
+  }
+
+  Future<dynamic> updateQuantityProductInCart(productId, newQuantity) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('metaData');
+      if (token == null) {
+        throw Exception('No token found. Please log in again.');
+      }
+      var metaData = jsonDecode(token);
+      var accessToken = metaData['token']['accessToken'];
+      final response = await http.patch(
+        Uri.parse('$baseUrl/fillQuantityUpdateProductInCart'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': '$accessToken'
+        },
+        body: jsonEncode({'productId': productId, 'newQuantity': newQuantity}),
+      );
+
+      if (response.statusCode != 200) {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception(
+            errorResponse['message'] ?? 'Failed to update quantity.');
+      }
+    } catch (e) {
+      // print('Error fetching cart: $e');
+      throw e;
     }
   }
 }
