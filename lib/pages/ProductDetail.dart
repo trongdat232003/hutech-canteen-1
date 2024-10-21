@@ -19,16 +19,11 @@ class ProductDetail extends StatefulWidget {
 class _ProductDetailState extends State<ProductDetail> {
   var product;
   var selectedQuantity = 1;
+  final int maxInventory = 50;
   @override
   void initState() {
     // TODO: implement initState
     fetchProductByID(widget.productID);
-  }
-
-  void updateQuantity(int quantity) {
-    setState(() {
-      selectedQuantity = quantity;
-    });
   }
 
   void fetchProductByID(String productID) async {
@@ -39,6 +34,7 @@ class _ProductDetailState extends State<ProductDetail> {
       if (fetchedProduct == null) {
         throw Exception('Product not found');
       }
+
       setState(() {
         product = fetchedProduct;
       });
@@ -61,6 +57,12 @@ class _ProductDetailState extends State<ProductDetail> {
         SnackBar(content: Text('Error adding to cart: $e')),
       );
     }
+  }
+
+  void updateQuantity(int quantity) {
+    setState(() {
+      selectedQuantity = quantity;
+    });
   }
 
   @override
@@ -217,6 +219,7 @@ class _ProductDetailState extends State<ProductDetail> {
                             ),
                             QuantityControl(
                                 quantity: selectedQuantity,
+                                maxInventory: maxInventory,
                                 onQuantityChanged: updateQuantity),
                           ],
                         ),

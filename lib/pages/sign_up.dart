@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:hutech_cateen/services/apiAuth.dart';
 
@@ -21,19 +21,19 @@ class _SignUpState extends State<SignUp> {
   bool _obscureText1 = true;
 
   final ApiAuth _apiAuth = ApiAuth();
-  void showSuccessToast() {
-    Fluttertoast.showToast(
-      msg: "Đăng ký thành công!",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP_RIGHT,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-      fontSize: 16.0,
-      timeInSecForIosWeb: 1,
-      webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
-      webPosition: "right",
-    );
-  }
+  // void showSuccessToast() {
+  //   Fluttertoast.showToast(
+  //     msg: "Đăng ký thành công!",
+  //     toastLength: Toast.LENGTH_LONG,
+  //     gravity: ToastGravity.TOP_RIGHT,
+  //     backgroundColor: Colors.green,
+  //     textColor: Colors.white,
+  //     fontSize: 16.0,
+  //     timeInSecForIosWeb: 1,
+  //     webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+  //     webPosition: "right",
+  //   );
+  // }
 
   void _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -43,16 +43,17 @@ class _SignUpState extends State<SignUp> {
 
       var success = await _apiAuth.signUp(name, email, password);
       if (success) {
-        showSuccessToast();
+        // showSuccessToast();
         Navigator.pushReplacementNamed(context, '/login');
-      } else {
-        // Hiển thị thông báo lỗi cho người dùng
-        Fluttertoast.showToast(
-          msg: "Đăng ký thất bại!",
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
       }
+      // else {
+      //   // Hiển thị thông báo lỗi cho người dùng
+      //   Fluttertoast.showToast(
+      //     msg: "Đăng ký thất bại!",
+      //     backgroundColor: Colors.red,
+      //     textColor: Colors.white,
+      //   );
+      // }
     }
   }
 
