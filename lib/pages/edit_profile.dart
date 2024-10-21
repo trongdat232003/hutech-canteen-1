@@ -38,6 +38,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print("User data found: $metaDataString");
       // Update user info in state
       final responseData = jsonDecode(metaDataString);
+      print(responseData);
       setState(() {
         name = responseData['user']['name'];
         email = responseData['user']['email'];

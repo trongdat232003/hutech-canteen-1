@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiShoppingCart {
-  String baseUrl = 'http://localhost:3000/v2/api/cart';
+  String baseUrl = 'http://10.0.2.2:3000/v2/api/cart';
 
   Future<dynamic> addToCart(productId, quantity) async {
     try {

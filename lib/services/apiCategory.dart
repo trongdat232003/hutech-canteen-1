@@ -13,7 +13,7 @@ class ApiCategoryService {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var categories = data['metaData'];
-
+        print(categories);
         return categories; // Trả về data từ API
       } else {
         throw Exception('Failed to load categories');

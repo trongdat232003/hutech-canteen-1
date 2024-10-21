@@ -199,7 +199,7 @@ class _HomeState extends State<Home> {
                             itemBuilder: (context, index) {
                               return CategoryItem(
                                 image: categoriesImage[index],
-                                title: categories[index]['meal'],
+                                title: categories[index]['meals'],
                                 categoryID: categories[index]['id'],
                               );
                             })
