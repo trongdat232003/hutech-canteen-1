@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hutech_cateen/pages/edit_profile.dart';
+import 'package:hutech_cateen/pages/login.dart';
 import 'package:hutech_cateen/pages/review_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -10,6 +16,55 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  String userName = '';
+  String avatarUrl = '';
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('accessToken'); // Retrieve the access token
+
+    if (token != null) {
+      try {
+        // Make the API call to get user info
+        final response = await http.get(
+          Uri.parse('http://10.0.2.2:3000/v2/api/user/getUserInfo'),
+          headers: {
+            'Authorization': token, // Include the access token
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['status'] == 200) {
+            var user = responseData['metaData'];
+            // Update user info in state
+            setState(() {
+              userName = user['name'];
+              avatarUrl = user['avatar']
+                  .replaceAll(r'\', '/'); // Fix the avatar URL format
+              // Ensure to prefix with the base URL
+              avatarUrl = 'http://10.0.2.2:3000/$avatarUrl';
+            });
+          } else {
+            print("Error: ${responseData['message']}");
+          }
+        } else {
+          print(
+              "Failed to load user data, status code: ${response.statusCode}");
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    } else {
+      print("No token found in SharedPreferences.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,17 +81,6 @@ class _ProfileState extends State<Profile> {
           "Profile",
           style: TextStyle(fontSize: 18),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.more_horiz, // Dấu 3 chấm
-              color: Colors.black, // Màu đen cho dấu 3 chấm
-            ),
-            onPressed: () {
-              // Xử lý khi bấm vào dấu 3 chấm
-            },
-          ),
-        ],
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -50,18 +94,23 @@ class _ProfileState extends State<Profile> {
                   children: [
                     CircleAvatar(
                       radius: 40,
-                      backgroundImage: AssetImage("images/user.jpg"),
+                      backgroundImage: avatarUrl.isNotEmpty
+                          ? NetworkImage(avatarUrl) // Tải hình từ URL
+                          : AssetImage("images/user.jpg")
+                              as ImageProvider, // Hình đại diện mặc định
                     ),
                     SizedBox(width: 25),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Visa Khadock",
+                          userName.isNotEmpty
+                              ? userName
+                              : "Tên khách hàng", // Tên người dùng
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
-                        Text("I love fast food"),
+                        Text("I love fast food"), // Thông điệp ngắn
                       ],
                     )
                   ],
@@ -79,28 +128,35 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.person_outline,
-                              color: Colors.orange,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfilePage()),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 10,
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Person info"),
-                          SizedBox(
-                            width: 190,
-                          ),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.person_outline,
+                                color: Colors.orange,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text("Person info"),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,
@@ -122,9 +178,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("Addresses"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -146,8 +200,8 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      TextButton(
-                        onPressed: () {
+                      GestureDetector(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -156,21 +210,22 @@ class _ProfileState extends State<Profile> {
                         },
                         child: Row(
                           children: [
+                            SizedBox(
+                              width: 10,
+                            ),
                             CircleAvatar(
                               radius: 15,
                               backgroundColor: Colors.white,
                               child: Icon(
-                                FeatherIcons.star,
-                                color: Colors.blueAccent,
+                                Icons.star,
+                                color: Colors.orange,
                               ),
                             ),
                             SizedBox(
                               width: 20,
                             ),
                             Text("Đánh giá"),
-                            SizedBox(
-                              width: 190,
-                            ),
+                            Spacer(),
                             Icon(Icons.arrow_forward_ios, size: 16),
                           ],
                         ),
@@ -195,9 +250,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("Favorite"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -221,9 +274,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("Notification"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -247,9 +298,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("Payment"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -288,9 +337,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("FAQs"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -314,9 +361,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("User review"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -340,9 +385,7 @@ class _ProfileState extends State<Profile> {
                             width: 20,
                           ),
                           Text("Settings"),
-                          SizedBox(
-                            width: 190,
-                          ),
+                          Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
@@ -364,28 +407,39 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.logout_outlined,
-                              color: Colors.red,
+                      GestureDetector(
+                        onTap: () async {
+                          // Clear SharedPreferences
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs
+                              .clear(); // This will remove all stored data
+
+                          // Navigate to the Login page
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => Login()),
+                            (Route<dynamic> route) =>
+                                false, // This removes all the previous routes from the stack
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            const CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.logout,
+                                color: Colors.orange,
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Log out"),
-                          SizedBox(
-                            width: 190,
-                          ),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                            const SizedBox(width: 20),
+                            const Text("Log out"),
+                            const Spacer(),
+                            const Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,

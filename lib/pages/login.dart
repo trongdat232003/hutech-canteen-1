@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:hutech_cateen/main.dart';
+import 'package:hutech_cateen/pages/bottomnav.dart';
 import 'package:hutech_cateen/pages/home.dart';
 import 'package:hutech_cateen/services/apiAuth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,16 +56,19 @@ class _LoginState extends State<Login> {
 
       var metaData = await _apiAuth.login(email, password);
       if (metaData != null) {
-        // showSuccessToast();
-        Navigator.pushReplacementNamed(context, '/home', arguments: metaData);
+        // Lưu accessToken vào SharedPreferences
+        await prefs.setString('accessToken', metaData['token']['accessToken']);
+
+        // Chuyển hướng đến BottomNav mà không khởi động lại MyApp
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => BottomNav()),
+        );
+      } else {
+        // Xử lý khi đăng nhập thất bại (nếu có)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Đăng nhập không thành công")),
+        );
       }
-      // else {
-      //   Fluttertoast.showToast(
-      //     msg: "Login thất bại!",
-      //     backgroundColor: Colors.red,
-      //     textColor: Colors.white,
-      //   );
-      // }
     }
   }
 
