@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/Components/empty_screen.dart';
 import 'package:hutech_cateen/pages/Order.dart';
+import 'package:hutech_cateen/services/api_review.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
 
@@ -13,11 +15,34 @@ class ReviewScreen extends StatefulWidget {
 class _ReviewScreenState extends State<ReviewScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  List orderNotReviews = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchOrderNotReviews();
+  }
+
+  void fetchOrderNotReviews() async {
+    try {
+      ApiReview apiService = ApiReview();
+      List<dynamic> fetchedOrderNotReviews =
+          await apiService.getOrderNotReviews();
+
+      setState(() {
+        orderNotReviews = fetchedOrderNotReviews
+            .map((notReview) => {
+                  'notReviewID': notReview['_id'],
+                  'productID': notReview['order_product']['productId'],
+                  'productImage': notReview['order_product']['product_thumb'],
+                  'productQuantity': notReview['order_product']['quantity']
+                })
+            .toList();
+      });
+    } catch (e) {
+      print('Error fetching reviews: $e');
+    }
   }
 
   @override
@@ -52,74 +77,51 @@ class _ReviewScreenState extends State<ReviewScreen>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // Ongoing Orders
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$35.25',
-                status: 'Track Order',
-                items: '03 Items',
-                orderDate: '29 JAN, 12:30',
-                itemId: '#162432',
-                isOngoing: true,
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$40.15',
-                status: 'Track Order',
-                items: '02 Items',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#242432',
-                isOngoing: true,
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$10.20',
-                status: 'Track Order',
-                items: '01 Item',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#240112',
-                isOngoing: true,
-              ),
-            ],
-          ),
-          // History Orders
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$35.25',
-                status: 'Completed',
-                items: '03 Items',
-                orderDate: '29 JAN, 12:30',
-                itemId: '#162432',
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$40.15',
-                status: 'Completed',
-                items: '02 Items',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#242432',
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                price: '\$10.20',
-                status: 'Cancelled',
-                items: '01 Item',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#240112',
-              ),
-            ],
-          ),
-        ],
-      ),
+      body: orderNotReviews.length < 0
+          ? EmptyScreen(
+              title: 'Không có sản phẩm nào để đánh giá',
+              desc: 'Bạn đã hoàn tất đánh giá tất cả sản phẩm')
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                // Chưa đánh giá
+                ListView.builder(
+                  itemCount: orderNotReviews.length,
+                  itemBuilder: (context, index) {
+                    final item = orderNotReviews[index];
+                    return ListTile(
+                      leading: Image.asset(item['productImage'], width: 50),
+                      title: Text('Tên sản phẩm'),
+                      subtitle: Text('Còn 12 ngày để đánh giá'),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          // Handle review action here
+                        },
+                        child: Text('Đánh giá +200'),
+                      ),
+                    );
+                  },
+                ),
+                // Đã đánh giá
+                ListView.builder(
+                  itemCount: orderNotReviews.length,
+                  itemBuilder: (context, index) {
+                    final item = orderNotReviews[index];
+                    return ListTile(
+                      leading: Image.asset(item['productImage'], width: 50),
+                      title: Text('Tên sản phẩm'),
+                      subtitle: Text('Còn 12 ngày để đánh giá'),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          // Handle review action here
+                        },
+                        child: Text('Đánh giá +200'),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
     );
   }
 }
