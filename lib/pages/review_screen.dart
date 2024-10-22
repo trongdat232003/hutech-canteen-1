@@ -61,7 +61,6 @@ class _ReviewScreenState extends State<ReviewScreen>
             children: [
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Pizza Hut',
                 price: '\$35.25',
                 status: 'Track Order',
                 items: '03 Items',
@@ -71,7 +70,6 @@ class _ReviewScreenState extends State<ReviewScreen>
               ),
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'McDonald',
                 price: '\$40.15',
                 status: 'Track Order',
                 items: '02 Items',
@@ -81,7 +79,6 @@ class _ReviewScreenState extends State<ReviewScreen>
               ),
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Starbucks',
                 price: '\$10.20',
                 status: 'Track Order',
                 items: '01 Item',
@@ -97,7 +94,6 @@ class _ReviewScreenState extends State<ReviewScreen>
             children: [
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Pizza Hut',
                 price: '\$35.25',
                 status: 'Completed',
                 items: '03 Items',
@@ -106,7 +102,6 @@ class _ReviewScreenState extends State<ReviewScreen>
               ),
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'McDonald',
                 price: '\$40.15',
                 status: 'Completed',
                 items: '02 Items',
@@ -115,7 +110,6 @@ class _ReviewScreenState extends State<ReviewScreen>
               ),
               OrderCard(
                 imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Starbucks',
                 price: '\$10.20',
                 status: 'Cancelled',
                 items: '01 Item',

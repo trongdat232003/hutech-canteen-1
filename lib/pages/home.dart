@@ -133,15 +133,15 @@ class _HomeState extends State<Home> {
             const SizedBox(
               height: 30,
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EditProfilePage()),
-                );
-              },
-              child: const Text('Chỉnh sửa hồ sơ'),
-            ),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => EditProfilePage()),
+            //     );
+            //   },
+            //   child: const Text('Chỉnh sửa hồ sơ'),
+            // ),
             Search(),
             const SizedBox(
               height: 30,

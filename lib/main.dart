@@ -29,8 +29,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken =
-        prefs.getString('accessToken'); // Kiểm tra accessToken
+    String? accessToken = prefs.getString('accessToken');
     setState(() {
       _isLoggedIn =
           accessToken != null; // Nếu accessToken tồn tại thì đã đăng nhập
