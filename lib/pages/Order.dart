@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/services/apiListOrder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Order extends StatefulWidget {
   const Order({super.key});
@@ -9,11 +11,46 @@ class Order extends StatefulWidget {
 
 class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
   TabController? _tabController;
+  List<dynamic> ongoingOrders = [];
+  List<dynamic> historyOrders = [];
+  bool isLoading = true;
+
+  final OrderService _orderService = OrderService();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchOrders();
+  }
+
+  Future<void> fetchOrders() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        List<dynamic> successOrders =
+            await _orderService.fetchSuccessOrders(token);
+        List<dynamic> pendingOrders =
+            await _orderService.fetchPendingOrders(token);
+        List<dynamic> completedOrders =
+            await _orderService.fetchCompletedOrders(token);
+        List<dynamic> cancelledOrders =
+            await _orderService.fetchCancelledOrders(token);
+
+        setState(() {
+          ongoingOrders = [...successOrders, ...pendingOrders];
+          historyOrders = [...completedOrders, ...cancelledOrders];
+          isLoading = false;
+        });
+      } catch (e) {
+        print("Error fetching orders: $e");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -25,113 +62,60 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
           style: TextStyle(fontSize: 24, color: Colors.black),
         ),
         backgroundColor: Colors.white,
-        elevation: 0, // Remove shadow
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
-          )
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.orange,
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: Colors.orange,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-              tabs: const [
-                Tab(text: 'Ongoing'),
-                Tab(text: 'History'),
-              ],
-            ),
-          ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.orange,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.orange,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          tabs: const [
+            Tab(text: 'Ongoing'),
+            Tab(text: 'History'),
+          ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // Ongoing Orders
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Pizza Hut',
-                price: '\$35.25',
-                status: 'Track Order',
-                items: '03 Items',
-                orderDate: '29 JAN, 12:30',
-                itemId: '#162432',
-                isOngoing: true,
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'McDonald',
-                price: '\$40.15',
-                status: 'Track Order',
-                items: '02 Items',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#242432',
-                isOngoing: true,
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Starbucks',
-                price: '\$10.20',
-                status: 'Track Order',
-                items: '01 Item',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#240112',
-                isOngoing: true,
-              ),
-            ],
-          ),
-          // History Orders
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Pizza Hut',
-                price: '\$35.25',
-                status: 'Completed',
-                items: '03 Items',
-                orderDate: '29 JAN, 12:30',
-                itemId: '#162432',
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'McDonald',
-                price: '\$40.15',
-                status: 'Completed',
-                items: '02 Items',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#242432',
-              ),
-              OrderCard(
-                imageUrl: 'https://picfiles.alphacoders.com/322/322198.jpg',
-                restaurantName: 'Starbucks',
-                price: '\$10.20',
-                status: 'Cancelled',
-                items: '01 Item',
-                orderDate: '30 JAN, 12:30',
-                itemId: '#240112',
-              ),
-            ],
-          ),
-        ],
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                // Ongoing Orders
+                buildOrderList(ongoingOrders, true),
+                // History Orders
+                buildOrderList(historyOrders, false),
+              ],
+            ),
+    );
+  }
+
+  Widget buildOrderList(List<dynamic> orders, bool isOngoing) {
+    if (orders.isEmpty) {
+      return const Center(child: Text('No Orders Found.'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        var order = orders[index];
+        return OrderCard(
+          imageUrl: order['order_product'][0]['product_thumb'],
+          price: '${order['order_checkout']['final_price']} VND',
+          status: order['order_status'],
+          items: '${order['order_product'].length} Item(s)',
+          orderDate: order['order_checkout']['timeOrder'],
+          itemId: order['order_trackingNumber'],
+          isOngoing: isOngoing,
+        );
+      },
     );
   }
 }
 
 class OrderCard extends StatelessWidget {
   final String imageUrl;
-  final String restaurantName;
   final String price;
   final String status;
   final String items;
@@ -141,7 +125,6 @@ class OrderCard extends StatelessWidget {
 
   const OrderCard({
     required this.imageUrl,
-    required this.restaurantName,
     required this.price,
     required this.status,
     required this.items,
@@ -153,12 +136,16 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor;
-    if (status == 'Completed') {
+    if (status == 'completed') {
       statusColor = Colors.green;
-    } else if (status == 'Cancelled') {
+    } else if (status == 'cancelled') {
       statusColor = Colors.red;
-    } else {
+    } else if (status == 'pending') {
       statusColor = Colors.orange;
+    } else if (status == 'success') {
+      statusColor = Colors.blue; // New color for success
+    } else {
+      statusColor = Colors.grey; // Default color for any other status
     }
 
     return Card(
@@ -176,26 +163,19 @@ class OrderCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    imageUrl,
-                    width: 80,
-                    height: 80,
-                    fit: BoxFit.cover,
-                  ),
+                  // child: Image.network(
+                  //   imageUrl,
+                  //   width: 80,
+                  //   height: 80,
+                  //   fit: BoxFit.cover,
+                  // ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        restaurantName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      // Removed restaurant name
                       Text(
                         price,
                         style: TextStyle(
@@ -213,6 +193,14 @@ class OrderCard extends StatelessWidget {
                         'Ordered on $orderDate',
                         style: TextStyle(
                           color: Colors.grey[600],
+                        ),
+                      ),
+                      // Displaying order status
+                      Text(
+                        'Status: $status',
+                        style: TextStyle(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -238,8 +226,8 @@ class OrderCard extends StatelessWidget {
                   ),
                   child: Text(
                     isOngoing
-                        ? status
-                        : (status == 'Completed' ? 'Rate' : 'Re-Order'),
+                        ? (status == 'pending' ? 'Pending' : 'Track Order')
+                        : (status == 'completed' ? 'Rate' : 'Re-Order'),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
