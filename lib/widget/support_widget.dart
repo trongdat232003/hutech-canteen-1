@@ -37,7 +37,7 @@ class AppWidget {
   static TextStyle descripe() {
     return TextStyle(
       color: Colors.grey[500],
-      fontSize: 16,
+      fontSize: 14,
     );
   }
 

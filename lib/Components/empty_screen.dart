@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/widget/support_widget.dart';
 
 class EmptyScreen extends StatelessWidget {
   final String title;
@@ -14,12 +15,12 @@ class EmptyScreen extends StatelessWidget {
         children: <Widget>[
           Text(
             title,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: AppWidget.descripeStrong(),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 6),
           Text(
             desc,
-            style: TextStyle(fontSize: 16),
+            style: AppWidget.descripe(),
             textAlign: TextAlign.center,
           ),
         ],
