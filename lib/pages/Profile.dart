@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hutech_cateen/pages/edit_profile.dart';
 import 'package:hutech_cateen/pages/login.dart';
-import 'package:hutech_cateen/pages/review_screen.dart';
+import 'package:hutech_cateen/pages/reviews_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -205,7 +205,7 @@ class _ProfileState extends State<Profile> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ReviewScreen()),
+                                builder: (context) => ReviewsScreen()),
                           );
                         },
                         child: Row(
