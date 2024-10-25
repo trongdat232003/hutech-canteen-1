@@ -14,13 +14,13 @@ class ApiProduct {
         var data = jsonDecode(response.body);
         var products = data['metaData'];
 
-        return products; // Trả về data từ API
+        return products;
       } else {
         throw Exception('Failed to load Product');
       }
     } catch (e) {
       print('Error fetching Product: $e');
-      return []; // Trả về danh sách rỗng nếu xảy ra lỗi
+      return [];
     }
   }
 
@@ -38,19 +38,16 @@ class ApiProduct {
             'content-type': 'application/json',
             'Authorization': '$accessToken'
           });
-
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        var product = data['metaData']['product'];
-        print(product);
-        return product; // Trả về data từ API
+        var product = data['metaData'];
+        return product;
       } else {
         throw Exception('Failed to load Product');
       }
     } catch (e) {
       print('Error fetching Product: $e');
       return {};
-      // Trả về danh sách rỗng nếu xảy ra lỗi
     }
   }
 
