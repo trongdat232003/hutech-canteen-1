@@ -84,7 +84,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đánh giá thất bại: $e')),
+        SnackBar(content: Text('Failed to submit review: $e')),
       );
     }
   }
