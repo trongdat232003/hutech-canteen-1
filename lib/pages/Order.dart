@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/Components/empty_screen.dart';
 import 'package:hutech_cateen/services/apiListOrder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -78,21 +79,25 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                // Ongoing Orders
-                buildOrderList(ongoingOrders, true),
-                // History Orders
-                buildOrderList(historyOrders, false),
-              ],
+          : Container(
+              color: Colors.white, // Thêm màu nền ở đây
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Ongoing Orders
+                  buildOrderList(ongoingOrders, true),
+                  // History Orders
+                  buildOrderList(historyOrders, false),
+                ],
+              ),
             ),
     );
   }
 
   Widget buildOrderList(List<dynamic> orders, bool isOngoing) {
     if (orders.isEmpty) {
-      return const Center(child: Text('No Orders Found.'));
+      return const Center(
+          child: EmptyScreen(title: "Không có sản phẩm nào", desc: "Trống"));
     }
 
     return ListView.builder(

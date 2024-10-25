@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/Components/success_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hutech_cateen/pages/Profile.dart';
 import 'package:hutech_cateen/pages/bottomnav.dart';
@@ -47,6 +48,7 @@ class _MyAppState extends State<MyApp> {
         '/signup': (context) => const SignUp(),
         '/home': (context) => const Home(),
         '/forgot-password': (context) => const ForgotPassword(),
+        '/success': (context) => SuccessScreen(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

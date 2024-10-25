@@ -44,7 +44,7 @@ class _ReviewsScreenState extends State<ReviewsScreen>
       Map<String, dynamic> metaData = jsonDecode(metaDataString);
       setState(() {
         userName = metaData['user']['name'] ?? 'Người dùng';
-        userAvatarUrl = metaData['user']['avatar'] ?? 'images/user.jpg';
+        userAvatarUrl = 'images/user.jpg';
       });
     }
   }
@@ -69,7 +69,6 @@ class _ReviewsScreenState extends State<ReviewsScreen>
       });
     } catch (e) {
       print('Error fetching reviews: $e');
-      // Có thể hiển thị thông báo lỗi cho người dùng ở đây
     }
   }
 
@@ -80,18 +79,26 @@ class _ReviewsScreenState extends State<ReviewsScreen>
           await apiService.getOrderNotReviews();
 
       setState(() {
-        orderNotReviews = fetchedOrderNotReviews.map((notReview) {
-          return {
-            'orderID': notReview['_id'],
-            'productID': notReview['order_product'][0]['productId'],
-            'productImage': notReview['order_product'][0]['product_thumb'],
-            'productQuantity': notReview['order_product'][0]['quantity']
-          };
-        }).toList();
+        orderNotReviews = fetchedOrderNotReviews
+            .map((notReview) {
+              return notReview['order_product'].asMap().entries.map((entry) {
+                int index = entry.key;
+                var product = entry.value;
+                return {
+                  'orderID': notReview['_id'],
+                  'productID': product['productId'],
+                  'productImage': product['product_thumb'],
+                  'productQuantity': product['quantity'],
+                  'productName': product['product_name'],
+                  'index': index,
+                };
+              }).toList();
+            })
+            .expand((element) => element)
+            .toList();
       });
     } catch (e) {
       print('Error fetching orders not reviewed: $e');
-      // Có thể hiển thị thông báo lỗi cho người dùng ở đây
     }
   }
 
@@ -125,15 +132,12 @@ class _ReviewsScreenState extends State<ReviewsScreen>
           ),
         ),
       ),
-      body: orderNotReviews.isEmpty
-          ? EmptyScreen(
-              title: 'Không có sản phẩm nào để đánh giá',
-              desc: 'Bạn đã hoàn tất đánh giá tất cả sản phẩm')
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                // Chưa đánh giá
-                ListView.builder(
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // Chưa đánh giá
+          orderNotReviews.length > 0
+              ? ListView.builder(
                   itemCount: orderNotReviews.length,
                   itemBuilder: (context, index) {
                     final item = orderNotReviews[index];
@@ -160,7 +164,7 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'Tên sản phẩm', // Có thể thay đổi theo item['productName']
+                                    item['productName'].toString(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -176,14 +180,21 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => ReviewScreen(
-                                                orderID: item['orderID'],
-                                                productID: item['productID'])),
+                                          builder: (context) => ReviewScreen(
+                                            orderID: item['orderID'],
+                                            productID: item['productID'],
+                                          ),
+                                        ),
                                       );
+
+                                      if (result == true) {
+                                        fetchOrderNotReviews();
+                                        fetchReviews();
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
@@ -207,9 +218,13 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                       ),
                     );
                   },
-                ),
-                // Đã đánh giá
-                ListView.builder(
+                )
+              : EmptyScreen(
+                  title: 'Không có sản phẩm nào để đánh giá',
+                  desc: 'Bạn đã hoàn tất đánh giá tất cả sản phẩm'),
+          // Đã đánh giá
+          reviews.length > 0
+              ? ListView.builder(
                   itemCount: reviews.length,
                   itemBuilder: (context, index) {
                     final review = reviews[index];
@@ -286,9 +301,12 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                       ),
                     );
                   },
-                ),
-              ],
-            ),
+                )
+              : EmptyScreen(
+                  title: 'Bạn chưa đánh giá sản phẩm nào',
+                  desc: 'Trở về bên chưa đánh giá để đánh giá sản phẩm'),
+        ],
+      ),
     );
   }
 }
