@@ -20,8 +20,6 @@ class ApiOrder {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-
-      print(data['metaData']['paymentUrl']);
       return data['metaData']['paymentUrl']; // Lấy paymentUrl từ phản hồi
     } else {
       throw Exception('Failed to create order: ${response.body}');

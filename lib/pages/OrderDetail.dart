@@ -1,9 +1,11 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:url_launcher/url_launcher.dart';
 
-class OrderDetailPage extends StatelessWidget {
+class OrderDetailPage extends StatefulWidget {
   final List selectedCarts;
   final int totalPrice;
   final String paymentUrl;
@@ -14,6 +16,38 @@ class OrderDetailPage extends StatelessWidget {
     required this.totalPrice,
     required this.paymentUrl,
   }) : super(key: key);
+
+  @override
+  _OrderDetailPageState createState() => _OrderDetailPageState();
+}
+
+class _OrderDetailPageState extends State<OrderDetailPage> {
+  StreamSubscription? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinkListener();
+  }
+
+  void _initDeepLinkListener() {
+    // Listen for deep link changes
+    _sub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null && uri.host == 'momoSuccess') {
+        // Điều hướng về trang thông báo thành công
+        Navigator.pushReplacementNamed(context, '/success');
+      }
+    }, onError: (err) {
+      // Handle any errors
+      print('Failed to get deep link: $err');
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +64,12 @@ class OrderDetailPage extends StatelessWidget {
         padding: EdgeInsets.all(10.0),
         child: Column(
           children: [
+            // Phần hiển thị giỏ hàng
             Expanded(
               child: ListView.builder(
-                itemCount: selectedCarts.length,
+                itemCount: widget.selectedCarts.length,
                 itemBuilder: (context, index) {
-                  final item = selectedCarts[index];
+                  final item = widget.selectedCarts[index];
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     elevation: 3,
@@ -91,7 +126,7 @@ class OrderDetailPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Tổng: ${Helpers.formatPrice(totalPrice)}',
+                    'Tổng: ${Helpers.formatPrice(widget.totalPrice)}',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -100,8 +135,7 @@ class OrderDetailPage extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () => _launchPaymentUrl(
-                        paymentUrl), // Gọi hàm mở URL thanh toán
+                    onPressed: () => _launchPaymentUrl(widget.paymentUrl),
                     style: ElevatedButton.styleFrom(
                       padding:
                           EdgeInsets.symmetric(vertical: 15, horizontal: 80),
@@ -125,9 +159,7 @@ class OrderDetailPage extends StatelessWidget {
   }
 
   void _launchPaymentUrl(String url) async {
-    print(url);
     final Uri uri = Uri.parse(url);
-    print(uri);
     if (uri != null) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

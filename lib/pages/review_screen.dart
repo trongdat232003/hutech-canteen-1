@@ -77,13 +77,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
         _commentController.text,
         _rating,
       );
-      // Optionally show a success message or navigate back
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Review submitted successfully!')),
+        SnackBar(content: Text('Đánh giá thành công!')),
       );
-      Navigator.pop(context); // Go back to the previous screen
+      Navigator.pop(context, true);
     } catch (e) {
-      // Handle any errors that occur during review submission
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to submit review: $e')),
       );
