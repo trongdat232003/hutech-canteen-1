@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/Components/empty_screen.dart';
 import 'package:hutech_cateen/services/apiListOrder.dart';
+import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Order extends StatefulWidget {
@@ -59,7 +62,7 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'My Orders',
+          'Đơn đặt hàng',
           style: TextStyle(fontSize: 24, color: Colors.black),
         ),
         backgroundColor: Colors.white,
@@ -72,15 +75,16 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
           indicatorColor: Colors.orange,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           tabs: const [
-            Tab(text: 'Ongoing'),
-            Tab(text: 'History'),
+            Tab(text: 'Đang chờ'),
+            Tab(text: 'Lịch sử'),
           ],
         ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Container(
-              color: Colors.white, // Thêm màu nền ở đây
+
+              color: Color.fromARGB(255, 245, 243, 243), // Thêm màu nền ở đây
               child: TabBarView(
                 controller: _tabController,
                 children: [
@@ -107,7 +111,7 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
         var order = orders[index];
         return OrderCard(
           imageUrl: order['order_product'][0]['product_thumb'],
-          price: '${order['order_checkout']['final_price']} VND',
+          price: '${order['order_checkout']['final_price']}',
           status: order['order_status'],
           items: '${order['order_product'].length} Item(s)',
           orderDate: order['order_checkout']['timeOrder'],
@@ -148,12 +152,13 @@ class OrderCard extends StatelessWidget {
     } else if (status == 'pending') {
       statusColor = Colors.orange;
     } else if (status == 'success') {
-      statusColor = Colors.blue; // New color for success
+      statusColor = Colors.green; // New color for success
     } else {
       statusColor = Colors.grey; // Default color for any other status
     }
 
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -182,7 +187,7 @@ class OrderCard extends StatelessWidget {
                     children: [
                       // Removed restaurant name
                       Text(
-                        price,
+                        Helpers.formatPrice(int.parse(price)),
                         style: TextStyle(
                           color: Colors.orange[700],
                           fontSize: 16,
@@ -195,14 +200,14 @@ class OrderCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Ordered on $orderDate',
+                        'Đặt vào ngày $orderDate',
                         style: TextStyle(
                           color: Colors.grey[600],
                         ),
                       ),
                       // Displaying order status
                       Text(
-                        'Status: $status',
+                        'Trạng thái: $status',
                         style: TextStyle(
                           color: statusColor,
                           fontWeight: FontWeight.bold,
@@ -218,23 +223,8 @@ class OrderCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Order ID: $itemId',
+                  'Mã sản phẩm: $itemId',
                   style: TextStyle(color: Colors.grey[700]),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: statusColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Text(
-                    isOngoing
-                        ? (status == 'pending' ? 'Pending' : 'Track Order')
-                        : (status == 'completed' ? 'Rate' : 'Re-Order'),
-                    style: const TextStyle(color: Colors.white),
-                  ),
                 ),
               ],
             ),

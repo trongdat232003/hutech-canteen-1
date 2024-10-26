@@ -80,7 +80,7 @@ class _ProfileState extends State<Profile> {
               color: Colors.black,
             )),
         title: Text(
-          "Profile",
+          "Thông tin cá nhân",
           style: TextStyle(fontSize: 18),
         ),
       ),
@@ -112,7 +112,7 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
-                        Text("I love fast food"), // Thông điệp ngắn
+                        // Thông điệp ngắn
                       ],
                     )
                   ],
@@ -311,7 +311,7 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             const SizedBox(width: 20),
-                            const Text("Log out"),
+                            const Text("Đăng xuất"),
                             const Spacer(),
                             const Icon(Icons.arrow_forward_ios, size: 16),
                           ],

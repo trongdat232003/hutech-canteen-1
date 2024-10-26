@@ -77,7 +77,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "SIGN UP",
+                  "Đăng ký",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -85,7 +85,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: 5),
                 Text(
-                  "Please sign up to get started",
+                  "Vui lòng đăng ký để bắt đầu",
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -122,25 +122,25 @@ class _SignUpState extends State<SignUp> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "NAME",
+                        "Họ và tên",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
-                          labelText: "Enter your name",
+                          labelText: "Nhập họ và tên của bạn",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your name";
+                            return "Vui lòng không để trống";
                           }
                           final nameRegExp = RegExp(r'^[a-zA-Z\s]+$');
                           if (!nameRegExp.hasMatch(value)) {
-                            return "Name must not contain numbers or special characters";
+                            return "Tên không được chứa số hoặc ký tự đặc biệt";
                           }
                           return null;
                         },
@@ -154,26 +154,26 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          labelText: "Enter your email",
+                          labelText: "Nhập email của bạn",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your email";
+                            return "Vui lòng không để trống";
                           }
                           final emailRegExp = RegExp(
                               r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
                           if (!emailRegExp.hasMatch(value)) {
-                            return "Please enter a valid email";
+                            return "Vui lòng nhập đúng định dạng";
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 12),
                       Text(
-                        "PASSWORD",
+                        "Mật khẩu",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
@@ -181,7 +181,7 @@ class _SignUpState extends State<SignUp> {
                         controller: _passwordController,
                         obscureText: _obscureText,
                         decoration: InputDecoration(
-                          labelText: "Enter your password",
+                          labelText: "Nhập mật khẩu của bạn",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
@@ -200,19 +200,19 @@ class _SignUpState extends State<SignUp> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your password";
+                            return "Vui lòng không để trống";
                           }
                           final passwordRegExp = RegExp(
                               r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,}$');
                           if (!passwordRegExp.hasMatch(value)) {
-                            return "Password must be at least 6 characters, include an uppercase letter, lowercase letter, and a number";
+                            return "Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số";
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 12),
                       Text(
-                        "RE-TYPE PASSWORD",
+                        "Nhập lại mật khẩu",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
@@ -220,7 +220,7 @@ class _SignUpState extends State<SignUp> {
                         controller: _rePasswordController,
                         obscureText: _obscureText1,
                         decoration: InputDecoration(
-                          labelText: "Re-enter your password",
+                          labelText: "Nhập mật khẩu vừa nhập",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
@@ -239,10 +239,10 @@ class _SignUpState extends State<SignUp> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please re-enter your password";
+                            return "Vui lòng không để trống";
                           }
                           if (value != _passwordController.text) {
-                            return "Passwords do not match";
+                            return "Mật khẩu không giống mật khẩu đã nhập";
                           }
                           return null;
                         },
@@ -258,7 +258,7 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ),
                         child: Text(
-                          "SIGN UP",
+                          "Đăng ký",
                           style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

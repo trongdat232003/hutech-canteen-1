@@ -98,7 +98,7 @@ class _ProductDetailState extends State<ProductDetail> {
                     },
                   ),
                   title: Text(
-                    "Details",
+                    "Chi tiết",
                     style: AppWidget.titleAppBar(),
                   ),
                   actions: [
@@ -169,7 +169,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       SizedBox(height: 10),
                       Row(children: [
                         Text(
-                          "SIZE:",
+                          "Số lượng:",
                           style: AppWidget.boldTextMediumFieldStyle(),
                         ),
                         SizedBox(width: 16),
@@ -260,7 +260,7 @@ class _ProductDetailState extends State<ProductDetail> {
                               ),
                             ),
                             child: Text(
-                              "ADD TO CART",
+                              "Thêm vào giỏ hàng",
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,
