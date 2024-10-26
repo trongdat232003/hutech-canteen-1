@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:hutech_cateen/pages/edit_profile.dart';
+import 'package:hutech_cateen/pages/favorite_screen.dart';
 import 'package:hutech_cateen/pages/login.dart';
-import 'package:hutech_cateen/pages/review_screen.dart';
+import 'package:hutech_cateen/pages/reviews_screen.dart';
+import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -78,7 +80,7 @@ class _ProfileState extends State<Profile> {
               color: Colors.black,
             )),
         title: Text(
-          "Profile",
+          "Thông tin cá nhân",
           style: TextStyle(fontSize: 18),
         ),
       ),
@@ -110,13 +112,13 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 20),
                         ),
-                        Text("I love fast food"), // Thông điệp ngắn
+                        // Thông điệp ngắn
                       ],
                     )
                   ],
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 20,
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -152,35 +154,11 @@ class _ProfileState extends State<Profile> {
                             SizedBox(
                               width: 20,
                             ),
-                            Text("Person info"),
+                            Text("Thông tin cá nhân"),
                             Spacer(),
                             Icon(Icons.arrow_forward_ios, size: 16),
                           ],
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.my_location,
-                              color: Colors.orange,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Addresses"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
                       ),
                       SizedBox(
                         height: 10,
@@ -205,7 +183,7 @@ class _ProfileState extends State<Profile> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ReviewScreen()),
+                                builder: (context) => ReviewsScreen()),
                           );
                         },
                         child: Row(
@@ -233,26 +211,35 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.heart_broken_rounded,
-                              color: Colors.purple,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FavoriteScreen()),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 10,
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Favorite"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.favorite,
+                                color: Colors.orange,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text("Danh sách yêu thích"),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,
@@ -273,31 +260,7 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             width: 20,
                           ),
-                          Text("Notification"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.payment,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Payment"),
+                          Text("Thông báo"),
                           Spacer(),
                           Icon(Icons.arrow_forward_ios, size: 16),
                         ],
@@ -309,94 +272,7 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
                 SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.question_answer,
-                              color: Colors.blueAccent,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("FAQs"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.reviews,
-                              color: Colors.green,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("User review"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.settings,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Settings"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 30,
+                  height: 20,
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -435,7 +311,7 @@ class _ProfileState extends State<Profile> {
                               ),
                             ),
                             const SizedBox(width: 20),
-                            const Text("Log out"),
+                            const Text("Đăng xuất"),
                             const Spacer(),
                             const Icon(Icons.arrow_forward_ios, size: 16),
                           ],

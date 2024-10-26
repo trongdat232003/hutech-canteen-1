@@ -146,7 +146,7 @@ class _HomeState extends State<Home> {
             const SizedBox(
               height: 30,
             ),
-            RowTitle(title: 'All Categories'),
+            RowTitle(title: 'Danh mục'),
             const SizedBox(
               height: 15,
             ),
@@ -168,7 +168,7 @@ class _HomeState extends State<Home> {
                       ),
                     ],
                   ),
-                  width: 100,
+                  width: 118,
                   child: Row(
                     children: [
                       Container(
@@ -181,7 +181,7 @@ class _HomeState extends State<Home> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'All',
+                        'Tất cả',
                         style: AppWidget.boldTextSmallFieldStyle(),
                       )
                     ],
@@ -203,7 +203,7 @@ class _HomeState extends State<Home> {
                                 categoryID: categories[index]['id'],
                               );
                             })
-                        : const Center(child: Text("No categories available")),
+                        : const Center(child: Text("Không có danh mục nào")),
                   ),
                 ),
               ],
@@ -211,7 +211,7 @@ class _HomeState extends State<Home> {
             const SizedBox(
               height: 20,
             ),
-            RowTitle(title: 'All Products'),
+            RowTitle(title: 'Tất cả sản phẩm'),
             const SizedBox(height: 80),
             Container(
               margin: const EdgeInsets.only(left: 10),
@@ -229,7 +229,7 @@ class _HomeState extends State<Home> {
                           productID: products[index]['productID'],
                         );
                       })
-                  : const Center(child: Text("No products available")),
+                  : const Center(child: Text("Không có sản phẩm nào")),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:hutech_cateen/Components/quantity_control.dart';
 import 'package:hutech_cateen/pages/shopping_cart.dart';
+import 'package:hutech_cateen/services/api_favorite.dart';
 import 'package:hutech_cateen/services/api_shopping_cart.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -20,6 +21,7 @@ class _ProductDetailState extends State<ProductDetail> {
   var product;
   var selectedQuantity = 1;
   final int maxInventory = 50;
+  bool isFavorite = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -37,9 +39,21 @@ class _ProductDetailState extends State<ProductDetail> {
 
       setState(() {
         product = fetchedProduct;
+        isFavorite = fetchedProduct['favorites'];
       });
     } catch (e) {
       print('Error fetching subCategories: $e');
+    }
+  }
+
+  void toggleFavorite() async {
+    try {
+      await ApiFavorite().toggleFavorite(widget.productID);
+      setState(() {
+        isFavorite = !isFavorite;
+      });
+    } catch (e) {
+      print('Error toggling favorite: $e');
     }
   }
 
@@ -84,14 +98,18 @@ class _ProductDetailState extends State<ProductDetail> {
                     },
                   ),
                   title: Text(
-                    "Details",
+                    "Chi tiết",
                     style: AppWidget.titleAppBar(),
                   ),
                   actions: [
                     IconButton(
-                      icon: Icon(Icons.favorite_border,
-                          color: ColorWidget.primaryColor()),
-                      onPressed: () {},
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite
+                            ? ColorWidget.primaryColor()
+                            : ColorWidget.primaryColor(),
+                      ),
+                      onPressed: toggleFavorite,
                     ),
                   ],
                 ),
@@ -128,12 +146,14 @@ class _ProductDetailState extends State<ProductDetail> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            product!['product_name'],
+                            product!['product']['product_name'],
                             style: AppWidget.boldTextLargeFieldStyle(),
                           ),
                           Row(
                             children: [
-                              Text(product!['product_ratingAverage'].toString(),
+                              Text(
+                                  product!['product']['product_ratingAverage']
+                                      .toString(),
                                   style: AppWidget.boldTextSmallFieldStyle()),
                               SizedBox(width: 4),
                               Icon(Icons.star, color: Colors.orange, size: 20),
@@ -143,13 +163,13 @@ class _ProductDetailState extends State<ProductDetail> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        product!['product_description'],
+                        product!['product']['product_description'],
                         style: AppWidget.descripe(),
                       ),
                       SizedBox(height: 10),
                       Row(children: [
                         Text(
-                          "SIZE:",
+                          "Số lượng:",
                           style: AppWidget.boldTextMediumFieldStyle(),
                         ),
                         SizedBox(width: 16),
@@ -159,7 +179,7 @@ class _ProductDetailState extends State<ProductDetail> {
                               borderRadius: BorderRadius.circular(30)),
                           padding: EdgeInsets.all(10),
                           child: Text(
-                            product!['serving_size'],
+                            product!['product']['serving_size'],
                             style: AppWidget.descripeStrong(),
                           ),
                         ),
@@ -171,7 +191,7 @@ class _ProductDetailState extends State<ProductDetail> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        product!['product_usage'],
+                        product!['product']['product_usage'],
                         style: AppWidget.descripe(),
                       ),
                       SizedBox(height: 16),
@@ -184,7 +204,7 @@ class _ProductDetailState extends State<ProductDetail> {
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text(product!['ingredients'],
+                      Text(product!['product']['ingredients'],
                           style: AppWidget.descripe()),
                       Spacer(),
                     ],
@@ -210,7 +230,8 @@ class _ProductDetailState extends State<ProductDetail> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              Helpers.formatPrice(product!['product_price']),
+                              Helpers.formatPrice(
+                                  product!['product']['product_price']),
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
@@ -239,7 +260,7 @@ class _ProductDetailState extends State<ProductDetail> {
                               ),
                             ),
                             child: Text(
-                              "ADD TO CART",
+                              "Thêm vào giỏ hàng",
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,

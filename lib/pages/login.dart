@@ -87,13 +87,13 @@ class _LoginState extends State<Login> {
                 Image.asset("images/logo_hutech.png",
                     width: MediaQuery.of(context).size.width / 3),
                 SizedBox(height: 10),
-                Text("Login",
+                Text("Đăng nhập",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
                         color: Colors.white)),
                 SizedBox(height: 5),
-                Text("Please sign in to your existing account",
+                Text("Vui lòng đăng nhập vào tài khoản hiện tại của bạn",
                     style: TextStyle(color: Colors.white)),
               ],
             ),
@@ -122,26 +122,26 @@ class _LoginState extends State<Login> {
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          labelText: "Enter your email",
+                          labelText: "Nhập email của bạn",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(9.0)),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your email";
+                            return "Vui lòng không để trống";
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 20),
-                      Text("PASSWORD",
+                      Text("Mật khẩu",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscureText,
                         decoration: InputDecoration(
-                          labelText: "Enter your password",
+                          labelText: "Nhập mật khẩu của bạn",
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(9.0)),
                           suffixIcon: IconButton(
@@ -157,7 +157,7 @@ class _LoginState extends State<Login> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your password";
+                            return "Vui lòng không để trống";
                           }
                           return null;
                         },
@@ -176,14 +176,14 @@ class _LoginState extends State<Login> {
                                   });
                                 },
                               ),
-                              Text("Remember me"),
+                              Text("Nhớ mật khẩu"),
                             ],
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/forgot-password');
                             },
-                            child: Text("Forgot Password",
+                            child: Text("Quên mật khẩu",
                                 style: TextStyle(color: Colors.orange)),
                           ),
                         ],
@@ -207,12 +207,12 @@ class _LoginState extends State<Login> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account?"),
+                          Text("Bạn hiện không có tài khoản?"),
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/signup');
                             },
-                            child: Text("SIGN UP",
+                            child: Text("Đăng ký",
                                 style: TextStyle(
                                     color: Colors.orange,
                                     fontWeight: FontWeight.bold)),

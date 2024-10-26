@@ -103,7 +103,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 Image.asset("images/logo_hutech.png", width: 100),
                 const SizedBox(height: 10),
                 const Text(
-                  "Reset Password",
+                  "Khôi phục mật khẩu",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30,
@@ -137,35 +137,35 @@ class _ResetPasswordState extends State<ResetPassword> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "RESET CODE",
+                        "Mã khôi phục",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _resetCodeController,
                         decoration: InputDecoration(
-                          labelText: "Enter reset code",
+                          labelText: "Nhập mã khôi phục",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter the reset code';
+                            return 'Vui lòng không để trống';
                           }
                           return null;
                         },
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "NEW PASSWORD",
+                        "Mật khẩu mới",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: _newPasswordController,
                         decoration: InputDecoration(
-                          labelText: "Enter your new password",
+                          labelText: "Nhập mật khẩu mới",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
@@ -173,7 +173,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a new password';
+                            return 'Vui lòng không để trống';
                           }
                           return null;
                         },
@@ -197,7 +197,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   }
                                 : null, // Chỉ cho phép nhấn nếu _canResend là true
                             child: Text(
-                              "Resend Code",
+                              "Gửi lại mã",
                               style: TextStyle(
                                 decoration: TextDecoration.underline,
                                 color: _canResend
@@ -225,7 +225,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         child: _loading
                             ? const CircularProgressIndicator()
                             : const Text(
-                                "RESET PASSWORD",
+                                "Khôi phục",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,

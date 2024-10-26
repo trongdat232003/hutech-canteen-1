@@ -56,7 +56,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // Handle saving user profile changes
   Future<void> _saveChanges() async {
     if (_nameController.text.isNotEmpty) {
-      final snackBar = SnackBar(content: Text('Updating profile...'));
+      final snackBar = SnackBar(content: Text('Đang cập nhật thông tin'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
       bool success = await apiAuth.editProfile(
@@ -66,10 +66,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (success) {
         await _updateUserMetaData(); // Ensure this is awaited
-        _showSnackBar('Profile updated successfully!');
+        _showSnackBar('Cập nhật thông tin thành công');
         _navigateToLogin(); // Navigate to login page
       } else {
-        _showSnackBar('Failed to update profile.');
+        _showSnackBar('Lỗi khi cập nhật thông tin');
       }
     } else {
       _showSnackBar('Name cannot be empty!');
@@ -137,7 +137,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Edit Profile",
+          "Chỉnh sửa thông tin cá nhân",
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -190,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Edit Your Name",
+                  "Họ và Tên",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
@@ -203,7 +203,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     fillColor: Colors.grey[100],
                     filled: true,
-                    hintText: "Enter your name",
+                    hintText: "Nhập họ và tên của bạn",
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -212,7 +212,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text('Save Changes'),
+                  child: const Text('Lưu'),
                 ),
               ],
             ),
@@ -233,7 +233,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Choose Image Source',
+                'Chọn ảnh',
                 style: TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 10),

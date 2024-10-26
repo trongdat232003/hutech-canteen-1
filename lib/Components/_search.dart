@@ -21,7 +21,7 @@ class _SearchState extends State<Search> {
       child: TextField(
         decoration: InputDecoration(
             border: InputBorder.none,
-            hintText: "Search Products",
+            hintText: "Tìm kiếm sản phẩm",
             hintStyle: AppWidget.lightTextFieldStyle(),
             prefixIcon: Icon(Icons.search)),
       ),

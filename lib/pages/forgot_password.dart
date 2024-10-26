@@ -63,7 +63,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 Image.asset("images/logo_hutech.png", width: screenWidth / 3),
                 const SizedBox(height: 10),
                 const Text(
-                  "Forgot Password",
+                  "Quên mật khẩu",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 30,
@@ -102,14 +102,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
-                          labelText: "Enter your email",
+                          labelText: "Vui lòng nhập email của bạn",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9.0),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return 'Vui lòng không để trống';
                           }
                           return null;
                         },
@@ -127,7 +127,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         child: _loading
                             ? const CircularProgressIndicator()
                             : const Text(
-                                "SUBMIT",
+                                "Xác nhận",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,

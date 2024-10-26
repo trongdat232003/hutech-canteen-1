@@ -17,12 +17,8 @@ class InfoUser extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Hey, ${userName}",
+              "Chào, ${userName}",
               style: AppWidget.boldTextLargeFieldStyle(),
-            ),
-            Text(
-              "Good morning!",
-              style: AppWidget.lightTextFieldStyle(),
             ),
           ],
         ),
