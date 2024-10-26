@@ -15,7 +15,7 @@ class RowTitle extends StatelessWidget {
       ),
       Row(
         children: [
-          Text('See All', style: AppWidget.lightTextFieldStyle()),
+          Text('z', style: AppWidget.lightTextFieldStyle()),
           SizedBox(width: 6),
           Icon(
             Icons.arrow_forward_ios_rounded,
