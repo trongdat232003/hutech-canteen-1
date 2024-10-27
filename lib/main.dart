@@ -40,22 +40,21 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      initialRoute: "/",
-      routes: {
-        '/login': (context) => const Login(),
-        '/signup': (context) => const SignUp(),
-        '/home': (context) => const Home(),
-        '/forgot-password': (context) => const ForgotPassword(),
-        '/success': (context) => SuccessScreen(),
-      },
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      // Hiển thị BottomNav nếu đã đăng nhập, nếu không hiển thị Login
-      home: _isLoggedIn ? BottomNav() : const Login(),
-    );
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        initialRoute: "/",
+        routes: {
+          '/login': (context) => const Login(),
+          '/signup': (context) => const SignUp(),
+          '/home': (context) => const Home(),
+          '/forgot-password': (context) => const ForgotPassword(),
+          '/success': (context) => SuccessScreen(),
+        },
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        // Hiển thị BottomNav nếu đã đăng nhập, nếu không hiển thị Login
+        home: _isLoggedIn ? BottomNav() : const Login());
   }
 }
