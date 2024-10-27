@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:hutech_cateen/pages/discount_screen.dart';
 import 'package:hutech_cateen/pages/edit_profile.dart';
 import 'package:hutech_cateen/pages/favorite_screen.dart';
 import 'package:hutech_cateen/pages/login.dart';
@@ -244,26 +245,35 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              Icons.notification_important,
-                              color: Colors.orange,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DiscountScreen()),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 10,
                             ),
-                          ),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Text("Thông báo"),
-                          Spacer(),
-                          Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.discount,
+                                color: Colors.orange,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text("Kho voucher"),
+                            Spacer(),
+                            Icon(Icons.arrow_forward_ios, size: 16),
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: 10,

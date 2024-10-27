@@ -57,12 +57,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       appBar: AppBar(
         title: Text(
           'Sản phẩm yêu thích',
-          style:
-              AppWidget.boldTextMediumFieldStyle(), // Sử dụng style tùy chỉnh
+          style: AppWidget.boldTextMediumFieldStyle(),
         ),
-        iconTheme: IconThemeData(
-            color: ColorWidget.primaryColor()), // Màu sắc của biểu tượng
-        backgroundColor: Colors.white, // Màu nền trắng cho AppBar
+        iconTheme: IconThemeData(color: ColorWidget.primaryColor()),
+        backgroundColor: Colors.white,
       ),
       body: Column(
         children: [
