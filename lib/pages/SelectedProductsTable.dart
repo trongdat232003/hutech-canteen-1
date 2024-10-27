@@ -5,12 +5,14 @@ import 'package:hutech_cateen/widget/support_color.dart';
 class SelectedProductsTable extends StatelessWidget {
   final List<Map<String, dynamic>> selectedCarts;
   final int totalPrice;
+  final String discount; // Thêm thuộc tính discount
   final VoidCallback onNavigate;
 
   const SelectedProductsTable({
     Key? key,
     required this.selectedCarts,
     required this.totalPrice,
+    required this.discount, // Thêm thuộc tính discount
     required this.onNavigate,
   }) : super(key: key);
 
@@ -101,6 +103,31 @@ class SelectedProductsTable extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  // Hiển thị mã giảm giá
+                  if (discount.isNotEmpty) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Mã Giảm Giá:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Text(
+                          discount,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: ColorWidget.primaryColor(),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   Center(
                     child: ElevatedButton(

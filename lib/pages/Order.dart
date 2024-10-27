@@ -83,7 +83,6 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Container(
-
               color: Color.fromARGB(255, 245, 243, 243), // Thêm màu nền ở đây
               child: TabBarView(
                 controller: _tabController,

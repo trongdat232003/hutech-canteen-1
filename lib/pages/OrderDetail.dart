@@ -1,5 +1,6 @@
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
+import 'package:hutech_cateen/widget/support_widget.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -8,13 +9,23 @@ import 'package:url_launcher/url_launcher.dart';
 class OrderDetailPage extends StatefulWidget {
   final List selectedCarts;
   final int totalPrice;
+  final int totalDiscount;
+  final int finalPrice;
   final String paymentUrl;
+  final String discount;
+  final String productImage;
+  final int productPrice;
 
   const OrderDetailPage({
     Key? key,
     required this.selectedCarts,
     required this.totalPrice,
     required this.paymentUrl,
+    required this.discount,
+    required this.finalPrice,
+    required this.totalDiscount,
+    required this.productImage,
+    required this.productPrice,
   }) : super(key: key);
 
   @override
@@ -33,7 +44,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   void _initDeepLinkListener() {
     _sub = uriLinkStream.listen((Uri? uri) {
       if (uri != null && uri.host == 'momoSuccess') {
-        Navigator.pushReplacementNamed(context, '/success');
+        // Navigate to home page
+        Navigator.pushReplacementNamed(context, '/home');
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Thanh toán thành công!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
       }
     }, onError: (err) {
       print('Failed to get deep link: $err');
@@ -51,20 +71,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text(
-          'Chi Tiết Đơn Hàng',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
+        title: Text('Chi Tiết Đơn Hàng', style: AppWidget.titleAppBar()),
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -75,25 +88,21 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   final item = widget.selectedCarts[index];
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     color: Colors.white,
                     elevation: 4,
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             width: 80,
-                            height: 80,
+                            height: 60,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(
-                                colors: [Colors.blue[200]!, Colors.blue[400]!],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              image: DecorationImage(
+                                image: AssetImage(widget
+                                    .productImage), // Hiển thị ảnh sản phẩm
                               ),
                             ),
                           ),
@@ -120,7 +129,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  'Giá: ${Helpers.formatPrice(item['totalPrice'])}',
+                                  'Giá: ${Helpers.formatPrice(widget.productPrice)}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: ColorWidget.primaryColor(),
@@ -136,11 +145,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -149,52 +157,143 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ),
                 ],
               ),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Tổng Cộng:',
+                        'Mã Giảm Giá:',
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
                         ),
                       ),
                       Text(
-                        Helpers.formatPrice(widget.totalPrice),
+                        widget.discount,
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: ColorWidget.primaryColor(),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _launchPaymentUrl(widget.paymentUrl),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: ColorWidget.primaryColor(),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.payment, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text(
-                          'Thanh Toán Ngay',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+              child: Column(
+                children: [
+                  Text(
+                    'Chi tiết thanh toán',
+                    style: AppWidget.boldTextSmallFieldStyle(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng Tiền Sản Phẩm:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
                         ),
-                      ],
-                    ),
+                      ),
+                      Text(
+                        Helpers.formatPrice(widget.totalPrice),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng tiền giảm giá:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        Helpers.formatPrice(widget.totalDiscount),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tổng thanh toán:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        Helpers.formatPrice(widget.finalPrice),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _launchPaymentUrl(widget.paymentUrl),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: ColorWidget.primaryColor(),
+                shape: RoundedRectangleBorder(),
+                elevation: 5,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.payment, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text(
+                    'Thanh Toán ${Helpers.formatPrice(widget.finalPrice)}',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ],
               ),
@@ -204,7 +303,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       ),
     );
   }
-  
 
   void _launchPaymentUrl(String url) async {
     final Uri uri = Uri.parse(url);
