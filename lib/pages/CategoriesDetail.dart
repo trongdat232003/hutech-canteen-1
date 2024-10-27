@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/Components/ProductItem.dart';
 import 'package:hutech_cateen/services/apiProduct.dart';
@@ -16,7 +17,9 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
   bool isSearchActive = false;
   List subCategories = [];
   List products = [];
+  List searchResults = [];
   String selectedCategory = '';
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -33,8 +36,8 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
       setState(() {
         subCategories = fetchedSubCategories
             .map((subCategory) => {
-                  'id': subCategory['_id'], // Lưu trữ ID của subCategory
-                  'name': subCategory['sc_name'], // Lưu trữ tên của subCategory
+                  'id': subCategory['_id'],
+                  'name': subCategory['sc_name'],
                 })
             .toList();
 
@@ -51,21 +54,34 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
   void fetchProductsBySubCategoryID(String subCategoryID) async {
     try {
       ApiProduct apiService = ApiProduct();
-      List<dynamic> fetchProducts =
+      List<dynamic> fetchedProducts =
           await apiService.getProductsBySubCategoryID(subCategoryID);
 
       setState(() {
-        products = fetchProducts
+        products = fetchedProducts
             .map((product) => {
                   'productName': product['product_name'],
                   'productImage': product['product_thumb'],
                   'productID': product['_id']
                 })
             .toList();
+        searchResults = products;
+        searchQuery = '';
       });
     } catch (e) {
-      print('Error fetching subCategories: $e');
+      print('Error fetching products: $e');
     }
+  }
+
+  void handleSearch(String query) {
+    setState(() {
+      searchQuery = query;
+      searchResults = products.where((product) {
+        return product['productName']
+            .toLowerCase()
+            .contains(query.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -78,7 +94,6 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Back Button
             Row(
               children: [
                 IconButton(
@@ -87,7 +102,6 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                     Navigator.pop(context);
                   },
                 ),
-                // Dropdown Button
                 Container(
                   margin: EdgeInsets.only(left: 10, right: 20),
                   decoration: BoxDecoration(
@@ -102,6 +116,8 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedCategory = newValue!;
+                        isSearchActive = false; // Đóng thanh tìm kiếm
+                        searchQuery = ''; // Xóa giá trị tìm kiếm
                         fetchProductsBySubCategoryID(selectedCategory);
                       });
                     },
@@ -125,7 +141,6 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                 ),
               ],
             ),
-            // Search Icon or TextField
             isSearchActive
                 ? Expanded(
                     child: TextField(
@@ -133,6 +148,7 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                         hintText: 'Search...',
                         border: InputBorder.none,
                       ),
+                      onChanged: handleSearch,
                       onSubmitted: (value) {
                         setState(() {
                           isSearchActive = false;
@@ -162,12 +178,10 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Popular Products
             Text(
               'Popular Burgers',
               style: AppWidget.semiboldTextFieldStyle(),
             ),
-
             Expanded(
               child: GridView.builder(
                   physics: BouncingScrollPhysics(),
@@ -178,12 +192,12 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 40),
-                  itemCount: products.length,
+                  itemCount: searchResults.length,
                   itemBuilder: (context, index) {
                     return ProductItem(
                         image: 'images/pho.png',
-                        title: products[index]['productName'],
-                        productID: products[index]['productID']);
+                        title: searchResults[index]['productName'],
+                        productID: searchResults[index]['productID']);
                   }),
             )
           ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/pages/shopping_cart.dart';
 import 'package:hutech_cateen/services/api_favorite.dart';
+import 'package:hutech_cateen/services/api_shopping_cart.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart'; // Đảm bảo bạn có định nghĩa ColorWidget
@@ -14,7 +16,7 @@ class FavoriteScreen extends StatefulWidget {
 class _FavoriteScreenState extends State<FavoriteScreen> {
   final ApiFavorite apiFavorite = ApiFavorite();
   List<dynamic> favoriteProducts = [];
-
+  int selectedQuantity = 1;
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,22 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       });
     } catch (e) {
       print('Error fetching favorites: $e');
+    }
+  }
+
+  void fetchAddToCart(String productID, int selectedQuantity) async {
+    try {
+      ApiShoppingCart apiService = ApiShoppingCart();
+      await apiService.addToCart(productID, selectedQuantity);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ShoppingCart()),
+      );
+    } catch (e) {
+      print('Error adding to cart: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding to cart: $e')),
+      );
     }
   }
 
@@ -86,7 +104,11 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                             ),
                             trailing: ElevatedButton(
                               onPressed: () {
-                                // Thêm hành động khi nhấn nút
+                                fetchAddToCart(
+                                  product[
+                                      '_id'], // Sử dụng ID sản phẩm từ danh sách yêu thích
+                                  selectedQuantity,
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: const CircleBorder(),
