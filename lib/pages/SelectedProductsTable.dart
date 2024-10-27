@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
-
 import 'package:hutech_cateen/widget/support_color.dart';
-
 
 class SelectedProductsTable extends StatelessWidget {
   final List<Map<String, dynamic>> selectedCarts;
@@ -20,27 +18,19 @@ class SelectedProductsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return selectedCarts.isNotEmpty
         ? Card(
-
             color: Colors.white,
-            elevation: 4,
+            elevation: 5,
             margin: const EdgeInsets.all(12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12),
-
-            elevation: 5,
-            margin: EdgeInsets.all(10),
-            child: Padding(
               padding: const EdgeInsets.all(16.0),
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Sản Phẩm Đã Chọn',
-
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -75,7 +65,7 @@ class SelectedProductsTable extends StatelessWidget {
                                 color: Colors.grey[600],
                               ),
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
                               Helpers.formatPrice(item['totalPrice']),
                               style: TextStyle(
@@ -93,7 +83,7 @@ class SelectedProductsTable extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Tổng Giá:',
                         style: TextStyle(
                           fontSize: 16,
@@ -134,38 +124,5 @@ class SelectedProductsTable extends StatelessWidget {
             ),
           )
         : const SizedBox(); // Return empty widget if no products are selected
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: selectedCarts.length,
-                    itemBuilder: (context, index) {
-                      final item = selectedCarts[index];
-                      return ListTile(
-                        title: Text(item['productName']),
-                        subtitle: Text(
-                          'Số lượng: ${item['quantity']} - Giá: ${Helpers.formatPrice(item['totalPrice'])}',
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Tổng Giá: ${Helpers.formatPrice(totalPrice)}',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: onNavigate,
-                    child: Text('Đi đến Chi Tiết Đơn Hàng'),
-                  ),
-                ],
-              ),
-            ),
-          )
-        : SizedBox(); // Trả về widget trống nếu không có sản phẩm nào được chọn
-
   }
 }
