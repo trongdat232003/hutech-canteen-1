@@ -70,4 +70,23 @@ class ApiProduct {
       return [];
     }
   }
+
+  Future<List<dynamic>> searchProducts(String keySearch) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/search?keySearch=$keySearch'),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var products = data['metaData'];
+        return products;
+      } else {
+        throw Exception('Failed to search products');
+      }
+    } catch (e) {
+      print('Error searching products: $e');
+      return [];
+    }
+  }
 }
