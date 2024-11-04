@@ -70,6 +70,34 @@ class ApiReview {
     }
   }
 
+  Future<dynamic> getAllReviewOfProduct(productID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('metaData');
+    if (token == null) {
+      throw Exception('No token found. Please log in again.');
+    }
+    var metaData = jsonDecode(token);
+    var accessToken = metaData['token']['accessToken'];
+    try {
+      final response = await http.get(
+          Uri.parse('$baseUrl/getAllReviewOfProduct/$productID'),
+          headers: {
+            'content-type': 'application/json',
+            'Authorization': '$accessToken'
+          });
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var review = data['metaData'];
+        return review;
+      } else {
+        throw Exception('Failed to load Review of Product');
+      }
+    } catch (e) {
+      print('Failed to load Review of Product: $e');
+      return {};
+    }
+  }
+
   Future<void> createReview(String orderID, String productID, String? img1,
       String? img2, String comment, double rating) async {
     try {

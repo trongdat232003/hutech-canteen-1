@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:hutech_cateen/Components/empty_screen.dart';
+import 'package:hutech_cateen/pages/order_detail_screen.dart';
 import 'package:hutech_cateen/services/apiListOrder.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -112,9 +113,10 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
           imageUrl: order['order_product'][0]['product_thumb'],
           price: '${order['order_checkout']['final_price']}',
           status: order['order_status'],
-          items: '${order['order_product'].length} Item(s)',
+          items: '${order['order_product'].length} sản phẩm',
           orderDate: order['order_checkout']['timeOrder'],
           itemId: order['order_trackingNumber'],
+          orderId: order['_id'],
           isOngoing: isOngoing,
         );
       },
@@ -129,6 +131,7 @@ class OrderCard extends StatelessWidget {
   final String items;
   final String orderDate;
   final String itemId;
+  final String orderId;
   final bool isOngoing;
 
   const OrderCard({
@@ -138,6 +141,7 @@ class OrderCard extends StatelessWidget {
     required this.items,
     required this.orderDate,
     required this.itemId,
+    required this.orderId,
     this.isOngoing = false,
   });
 
@@ -156,78 +160,88 @@ class OrderCard extends StatelessWidget {
       statusColor = Colors.grey;
     }
 
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  // child: Image.network(
-                  //   imageUrl,
-                  //   width: 80,
-                  //   height: 80,
-                  //   fit: BoxFit.cover,
-                  // ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Removed restaurant name
-                      Text(
-                        Helpers.formatPrice(int.parse(price)),
-                        style: TextStyle(
-                          color: Colors.orange[700],
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        items,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      Text(
-                        'Đặt vào ngày $orderDate',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      // Displaying order status
-                      Text(
-                        'Trạng thái: $status',
-                        style: TextStyle(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderDetailScreen(orderId: orderId),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        margin: const EdgeInsets.only(bottom: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    // child: Image.network(
+                    //   imageUrl,
+                    //   width: 80,
+                    //   height: 80,
+                    //   fit: BoxFit.cover,
+                    // ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Mã sản phẩm: $itemId',
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Removed restaurant name
+                        Text(
+                          Helpers.formatPrice(int.parse(price)),
+                          style: TextStyle(
+                            color: Colors.orange[700],
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          items,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          'Đặt vào ngày $orderDate',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        // Displaying order status
+                        Text(
+                          'Trạng thái: $status',
+                          style: TextStyle(
+                            color: statusColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Mã đơn hàng: $itemId',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

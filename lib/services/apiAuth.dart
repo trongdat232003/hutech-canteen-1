@@ -122,8 +122,8 @@ class ApiAuth {
 
   Future<String?> _uploadToCloudinary(File imageFile) async {
     final cloudinaryUrl =
-        'https://api.cloudinary.com/v1_1/dluwhbsel/image/upload';
-    final uploadPreset = 'flutter';
+        'https://api.cloudinary.com/v1_1/dkxoatxjl/image/upload';
+    final uploadPreset = 'ml_default';
 
     final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl))
       ..fields['upload_preset'] = uploadPreset

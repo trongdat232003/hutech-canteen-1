@@ -11,7 +11,6 @@ class ApiInventory {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         var inventory = data['metaData'];
-        print(inventory);
         return inventory;
       } else {
         throw Exception('Failed to load Product');

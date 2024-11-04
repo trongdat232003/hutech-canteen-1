@@ -12,6 +12,7 @@ import 'package:date_time_format/date_time_format.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class ReviewsScreen extends StatefulWidget {
   const ReviewsScreen({super.key});
@@ -26,26 +27,51 @@ class _ReviewsScreenState extends State<ReviewsScreen>
   List orderNotReviews = [];
   List reviews = [];
   String userName = '';
-  String userAvatarUrl = '';
+  String avatarUrl = '';
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     fetchOrderNotReviews();
     fetchReviews();
-    fetchUserData();
+    _loadUserData();
   }
 
-  void fetchUserData() async {
+  void _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? metaDataString = prefs.getString('metaData');
+    String? token = prefs.getString('token'); // Retrieve the token
 
-    if (metaDataString != null) {
-      Map<String, dynamic> metaData = jsonDecode(metaDataString);
-      setState(() {
-        userName = metaData['user']['name'] ?? 'Người dùng';
-        userAvatarUrl = 'images/user.jpg';
-      });
+    if (token != null) {
+      try {
+        // Make the API call to get user info
+        final response = await http.get(
+          Uri.parse('http://10.0.2.2:3000/v2/api/user/getUserInfo'),
+          headers: {
+            'Authorization': '$token', // Include the access token
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['status'] == 200) {
+            var user = responseData['metaData'];
+            // Update user info in state
+            setState(() {
+              userName = user['name'];
+              avatarUrl = user['avatar'];
+            });
+          } else {
+            print("Error: ${responseData['message']}");
+          }
+        } else {
+          print(
+              "Failed to load user data, status code: ${response.statusCode}");
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    } else {
+      print("No token found in SharedPreferences.");
     }
   }
 
@@ -246,8 +272,8 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: userAvatarUrl.isNotEmpty
-                                        ? NetworkImage(userAvatarUrl)
+                                    backgroundImage: avatarUrl.isNotEmpty
+                                        ? NetworkImage(avatarUrl)
                                         : AssetImage('images/user.png')
                                             as ImageProvider,
                                     radius: 25,

@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:hutech_cateen/Components/empty_screen.dart';
 import 'package:hutech_cateen/Components/quantity_control.dart';
 import 'package:hutech_cateen/pages/shopping_cart.dart';
 import 'package:hutech_cateen/services/api_favorite.dart';
 import 'package:hutech_cateen/services/api_inventory.dart';
+import 'package:hutech_cateen/services/api_review.dart';
 import 'package:hutech_cateen/services/api_shopping_cart.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -9,6 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:hutech_cateen/services/apiProduct.dart';
 import 'package:hutech_cateen/widget/support_color.dart';
 import 'package:hutech_cateen/widget/support_widget.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductDetail extends StatefulWidget {
   final String productID;
@@ -21,6 +29,9 @@ class ProductDetail extends StatefulWidget {
 class _ProductDetailState extends State<ProductDetail> {
   var product;
   var inventory;
+  var reviews = [];
+  String userName = '';
+  String avatarUrl = '';
   var selectedQuantity = 1;
   final int maxInventory = 50;
   bool isFavorite = false;
@@ -29,6 +40,46 @@ class _ProductDetailState extends State<ProductDetail> {
     // TODO: implement initState
     fetchProductByID(widget.productID);
     fetchInventoryByID(widget.productID);
+    fetchAllReviewOfProduct(widget.productID);
+    _loadUserData();
+  }
+
+  void _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token'); // Retrieve the token
+
+    if (token != null) {
+      try {
+        // Make the API call to get user info
+        final response = await http.get(
+          Uri.parse('http://10.0.2.2:3000/v2/api/user/getUserInfo'),
+          headers: {
+            'Authorization': '$token', // Include the access token
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['status'] == 200) {
+            var user = responseData['metaData'];
+            // Update user info in state
+            setState(() {
+              userName = user['name'];
+              avatarUrl = user['avatar'];
+            });
+          } else {
+            print("Error: ${responseData['message']}");
+          }
+        } else {
+          print(
+              "Failed to load user data, status code: ${response.statusCode}");
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    } else {
+      print("No token found in SharedPreferences.");
+    }
   }
 
   void fetchProductByID(String productID) async {
@@ -63,6 +114,23 @@ class _ProductDetailState extends State<ProductDetail> {
       });
     } catch (e) {
       print('Error fetching Inventory: $e');
+    }
+  }
+
+  void fetchAllReviewOfProduct(String productID) async {
+    try {
+      ApiReview apiService = ApiReview();
+      var fetchReview = await apiService.getAllReviewOfProduct(productID);
+
+      if (fetchReview == null) {
+        throw Exception('Review not found');
+      }
+
+      setState(() {
+        reviews = fetchReview;
+      });
+    } catch (e) {
+      print('Error fetching Review: $e');
     }
   }
 
@@ -245,6 +313,111 @@ class _ProductDetailState extends State<ProductDetail> {
                       Text(product!['product']['ingredients'],
                           style: AppWidget.descripe()),
                       Spacer(),
+                      Text('Đánh giá của khách hàng:'),
+                      Container(
+                        child: reviews.length > 0
+                            ? Expanded(
+                                child: ListView.builder(
+                                  itemCount: reviews.length,
+                                  itemBuilder: (context, index) {
+                                    final review = reviews[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0, vertical: 0),
+                                      child: Card(
+                                        color: Colors.white,
+                                        elevation: 3,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundImage: avatarUrl
+                                                            .isNotEmpty
+                                                        ? NetworkImage(
+                                                            avatarUrl)
+                                                        : AssetImage(
+                                                                'images/user.png')
+                                                            as ImageProvider,
+                                                    radius: 25,
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      userName, // Thay đổi theo review['productName']
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    RatingBarIndicator(
+                                                      rating: review[
+                                                              'review_rating']
+                                                          .toDouble(),
+                                                      itemCount: 5,
+                                                      itemSize: 15.0,
+                                                      direction:
+                                                          Axis.horizontal,
+                                                      unratedColor:
+                                                          Colors.grey[300],
+                                                      itemBuilder:
+                                                          (context, index) =>
+                                                              Icon(
+                                                        Icons.star,
+                                                        color: Colors.amber,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    Text(
+                                                      review['review_comment'],
+                                                      style: TextStyle(
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    Text(
+                                                      DateFormat(
+                                                              'd-M-yyyy HH:mm')
+                                                          .format(DateTime
+                                                              .parse(review[
+                                                                  'review_day'])),
+                                                      style: TextStyle(
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                            : EmptyScreen(
+                                title: 'Bạn chưa đánh giá sản phẩm nào',
+                                desc:
+                                    'Trở về bên chưa đánh giá để đánh giá sản phẩm'),
+                      )
                     ],
                   ),
                 ),

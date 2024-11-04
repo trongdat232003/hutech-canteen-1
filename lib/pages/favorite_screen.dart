@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hutech_cateen/pages/ProductDetail.dart';
 import 'package:hutech_cateen/pages/shopping_cart.dart';
 import 'package:hutech_cateen/services/api_favorite.dart';
 import 'package:hutech_cateen/services/api_shopping_cart.dart';
@@ -79,44 +80,56 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                       itemCount: favoriteProducts.length,
                       itemBuilder: (context, index) {
                         var product = favoriteProducts[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(10),
-                            leading: Image.network(
-                              product?['product_thumb'],
-                              fit: BoxFit.cover,
-                              width: 80,
-                            ),
-                            title: Text(
-                              product['product_name'],
-                              style: AppWidget.boldTextMediumFieldStyle(),
-                            ),
-                            subtitle: Text(
-                              '${Helpers.formatPrice(product['product_price'])} ',
-                              style: AppWidget.descripe(),
-                            ),
-                            trailing: ElevatedButton(
-                              onPressed: () {
-                                fetchAddToCart(
-                                  product[
-                                      '_id'], // Sử dụng ID sản phẩm từ danh sách yêu thích
-                                  selectedQuantity,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: const CircleBorder(),
-                                padding: const EdgeInsets.all(2),
-                                backgroundColor: ColorWidget.primaryColor(),
-                                foregroundColor: ColorWidget.primaryColor(),
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetail(
+                                  productID: product['_id'],
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              leading: Image.network(
+                                product?['product_thumb'],
+                                fit: BoxFit.cover,
+                                width: 80,
+                              ),
+                              title: Text(
+                                product['product_name'],
+                                style: AppWidget.boldTextMediumFieldStyle(),
+                              ),
+                              subtitle: Text(
+                                '${Helpers.formatPrice(product['product_price'])} ',
+                                style: AppWidget.descripe(),
+                              ),
+                              trailing: ElevatedButton(
+                                onPressed: () {
+                                  fetchAddToCart(
+                                    product[
+                                        '_id'], // Sử dụng ID sản phẩm từ danh sách yêu thích
+                                    selectedQuantity,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(2),
+                                  backgroundColor: ColorWidget.primaryColor(),
+                                  foregroundColor: ColorWidget.primaryColor(),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
