@@ -48,10 +48,7 @@ class _ProfileState extends State<Profile> {
             // Update user info in state
             setState(() {
               userName = user['name'];
-              avatarUrl = user['avatar']
-                  .replaceAll(r'\', '/'); // Fix the avatar URL format
-              // Ensure to prefix with the base URL
-              avatarUrl = 'http://10.0.2.2:3000/$avatarUrl';
+              avatarUrl = user['avatar'];
             });
           } else {
             print("Error: ${responseData['message']}");
