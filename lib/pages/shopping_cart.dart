@@ -52,6 +52,46 @@ class _ShoppingCartState extends State<ShoppingCart> {
     }
   }
 
+  void deleteProduct(String productId) async {
+    try {
+      ApiShoppingCart apiShoppingCart = ApiShoppingCart();
+      await apiShoppingCart.deleteCart(productId);
+      fetchShoppingCarts();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting product: $e')),
+      );
+    }
+  }
+
+  void showDeleteConfirmationDialog(String productId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text('Xác nhận xóa'),
+          content: Text('Bạn có chắc chắn muốn xóa sản phẩm này không?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Không'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteProduct(productId);
+                Navigator.of(context).pop();
+              },
+              child: Text('Có'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void fetchShoppingCarts() async {
     try {
       ApiShoppingCart apiShoppingCart = ApiShoppingCart();
@@ -61,6 +101,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
         carts = fetchShoppingCarts
             .map((cart) => {
                   'productId': cart['productId'],
+                  'productThumb': cart['product_thumb'],
                   'productName': cart['name'],
                   'quantity': cart['quantity'],
                   'totalPrice': cart['totalPrice'].toInt(),
@@ -157,12 +198,21 @@ class _ShoppingCartState extends State<ShoppingCart> {
       final totalAmount = orderDetail['order']['order_checkout']['totalAmount'];
       final totalDiscount =
           orderDetail['order']['order_checkout']['totalDiscount'];
-      final productImage =
-          orderDetail['order']['order_product'][0]['product_thumb'];
-      final productPrice = orderDetail['order']['order_product'][0]['price'];
       final finalPrice = orderDetail['order']['order_checkout']['final_price'];
       final paymentUrl = orderDetail['paymentUrl'];
       final discountCode = orderDetail['order']['order_discount_code'];
+
+      // Tạo danh sách để lưu thông tin sản phẩm
+      List<String> productImages = [];
+      List<int> productPrices = [];
+      List<int> quantityProducts = [];
+
+      // Lặp qua tất cả các sản phẩm để lấy thông tin
+      for (var product in orderDetail['order']['order_product']) {
+        productImages.add(product['product_thumb']);
+        productPrices.add(product['price']);
+        quantityProducts.add(product['quantity']);
+      }
 
       // Gọi hàm điều hướng đến trang OrderDetailPage với các tham số đã tạo
       Navigator.push(
@@ -172,11 +222,12 @@ class _ShoppingCartState extends State<ShoppingCart> {
             selectedCarts: selectedCarts,
             totalPrice: totalAmount,
             totalDiscount: totalDiscount,
-            productImage: productImage,
-            productPrice: productPrice,
+            productImages: productImages,
+            productPrices: productPrices,
             finalPrice: finalPrice,
             paymentUrl: paymentUrl,
             discount: discountCode,
+            quantityProducts: quantityProducts,
           ),
         ),
       );
@@ -239,13 +290,29 @@ class _ShoppingCartState extends State<ShoppingCart> {
                     final item = carts[index];
                     return Container(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              showDeleteConfirmationDialog(item['productId']);
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(24, 24),
+                              shape: const CircleBorder(),
+                              backgroundColor: Colors.red,
+                            ),
+                          ),
                           ListTile(
                             leading: Container(
                               width: 70,
                               height: 70,
-                              child: Image.asset(
-                                'images/pho.png',
+                              child: Image.network(
+                                item['productThumb'].toString(),
                                 width: 60,
                                 height: 60,
                               ),
@@ -257,7 +324,10 @@ class _ShoppingCartState extends State<ShoppingCart> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(item['productName']),
+                                    Container(
+                                      width: 130,
+                                      child: Text(item['productName']),
+                                    ),
                                     SizedBox(height: 8),
                                     Text(Helpers.formatPrice(
                                         item['totalPrice'])),

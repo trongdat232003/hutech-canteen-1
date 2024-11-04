@@ -20,7 +20,6 @@ class _BottomNavState extends State<BottomNav> {
   late Order order;
   late Profile profile;
   late ShoppingCart shoppingCart;
-  late Setting setting;
   int currentTabIndex = 0;
 
   @override
@@ -29,8 +28,7 @@ class _BottomNavState extends State<BottomNav> {
     order = Order();
     profile = Profile();
     shoppingCart = ShoppingCart();
-    setting = Setting();
-    pages = [homePage, order, shoppingCart, profile, setting];
+    pages = [homePage, order, shoppingCart, profile];
     super.initState();
   }
 
@@ -63,10 +61,6 @@ class _BottomNavState extends State<BottomNav> {
             ),
             Icon(
               Icons.person_outlined,
-              color: Colors.white,
-            ),
-            Icon(
-              Icons.settings,
               color: Colors.white,
             ),
           ]),

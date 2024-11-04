@@ -87,8 +87,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.all(10),
-                            leading: Image.asset(
-                              product['product_thumb'],
+                            leading: Image.network(
+                              product?['product_thumb'],
                               fit: BoxFit.cover,
                               width: 80,
                             ),

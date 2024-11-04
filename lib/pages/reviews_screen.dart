@@ -157,7 +157,7 @@ class _ReviewsScreenState extends State<ReviewsScreen>
                             children: [
                               Row(
                                 children: [
-                                  Image.asset(
+                                  Image.network(
                                     item['productImage'],
                                     width: 50,
                                     height: 50,

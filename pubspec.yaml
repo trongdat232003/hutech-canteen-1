@@ -77,14 +77,10 @@ flutter:
     assets:
         - images/user.jpg
         - images/drink.png
-        - images/noodle.png
-        - images/rice.jpg
-        - images/snack.png
+        - images/morning-coffee.png
+        - images/sunsets.png
+        - images/candies.png
         - images/food.png
-        - images/banhtrangtron.jpg
-        - images/comtam.png
-        - images/nuocdau.png
-        - images/pho.png
         - images/logo_hutech.png
         - images/twitter_logo.webp
         - images/facebook_logo.png

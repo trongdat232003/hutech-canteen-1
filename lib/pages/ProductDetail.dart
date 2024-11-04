@@ -1,6 +1,7 @@
 import 'package:hutech_cateen/Components/quantity_control.dart';
 import 'package:hutech_cateen/pages/shopping_cart.dart';
 import 'package:hutech_cateen/services/api_favorite.dart';
+import 'package:hutech_cateen/services/api_inventory.dart';
 import 'package:hutech_cateen/services/api_shopping_cart.dart';
 import 'package:hutech_cateen/utils/helpers.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -19,6 +20,7 @@ class ProductDetail extends StatefulWidget {
 
 class _ProductDetailState extends State<ProductDetail> {
   var product;
+  var inventory;
   var selectedQuantity = 1;
   final int maxInventory = 50;
   bool isFavorite = false;
@@ -26,6 +28,7 @@ class _ProductDetailState extends State<ProductDetail> {
   void initState() {
     // TODO: implement initState
     fetchProductByID(widget.productID);
+    fetchInventoryByID(widget.productID);
   }
 
   void fetchProductByID(String productID) async {
@@ -43,6 +46,23 @@ class _ProductDetailState extends State<ProductDetail> {
       });
     } catch (e) {
       print('Error fetching subCategories: $e');
+    }
+  }
+
+  void fetchInventoryByID(String productID) async {
+    try {
+      ApiInventory apiService = ApiInventory();
+      var fetchInventory = await apiService.getInventoryByProductId(productID);
+
+      if (fetchInventory == null) {
+        throw Exception('Inventory not found');
+      }
+
+      setState(() {
+        inventory = fetchInventory;
+      });
+    } catch (e) {
+      print('Error fetching Inventory: $e');
     }
   }
 
@@ -134,8 +154,9 @@ class _ProductDetailState extends State<ProductDetail> {
                           color: ColorWidget.primaryColor(),
                           borderRadius: BorderRadius.circular(40),
                         ),
-                        child: Image.asset(
-                          'images/pho.png', // Thay thế bằng hình ảnh của bạn
+                        child: Image.network(
+                          product!['product'][
+                              'product_thumb'], // Thay thế bằng hình ảnh của bạn
                           height: 180,
                           width: 180,
                         ),
@@ -167,6 +188,23 @@ class _ProductDetailState extends State<ProductDetail> {
                         style: AppWidget.descripe(),
                       ),
                       SizedBox(height: 10),
+                      Row(children: [
+                        Text(
+                          "Số lượng hàng trong kho:",
+                          style: AppWidget.boldTextMediumFieldStyle(),
+                        ),
+                        SizedBox(width: 10),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: ColorWidget.inputColor(),
+                              borderRadius: BorderRadius.circular(30)),
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            inventory!['inven_stock'].toString(),
+                            style: AppWidget.descripeStrong(),
+                          ),
+                        ),
+                      ]),
                       Row(children: [
                         Text(
                           "Số lượng:",

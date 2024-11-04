@@ -20,7 +20,7 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
   List searchResults = [];
   String selectedCategory = '';
   String searchQuery = '';
-
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -62,14 +62,17 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
             .map((product) => {
                   'productName': product['product_name'],
                   'productImage': product['product_thumb'],
-                  'productID': product['_id']
+                  'productID': product['_id'],
+                  'productPrice': product['product_price'].toString(),
                 })
             .toList();
         searchResults = products;
         searchQuery = '';
+        isLoading = false;
       });
     } catch (e) {
       print('Error fetching products: $e');
+      isLoading = false;
     }
   }
 
@@ -173,36 +176,37 @@ class _CategoriesDetailState extends State<CategoriesDetail> {
           ],
         ),
       ),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Popular Burgers',
-              style: AppWidget.semiboldTextFieldStyle(),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: GridView.builder(
+                        physics: BouncingScrollPhysics(),
+                        padding: EdgeInsets.only(top: 70),
+                        scrollDirection: Axis.vertical,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            childAspectRatio: 1.3,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 50),
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          return ProductItem(
+                              productPrice: searchResults[index]
+                                  ?['productPrice'],
+                              productThumb: searchResults[index]
+                                  ['productImage'],
+                              title: searchResults[index]['productName'],
+                              productID: searchResults[index]['productID']);
+                        }),
+                  )
+                ],
+              ),
             ),
-            Expanded(
-              child: GridView.builder(
-                  physics: BouncingScrollPhysics(),
-                  padding: EdgeInsets.only(top: 60),
-                  scrollDirection: Axis.vertical,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: 1.3,
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 40),
-                  itemCount: searchResults.length,
-                  itemBuilder: (context, index) {
-                    return ProductItem(
-                        image: 'images/pho.png',
-                        title: searchResults[index]['productName'],
-                        productID: searchResults[index]['productID']);
-                  }),
-            )
-          ],
-        ),
-      ),
     );
   }
 }

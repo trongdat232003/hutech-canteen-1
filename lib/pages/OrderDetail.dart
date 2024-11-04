@@ -13,20 +13,21 @@ class OrderDetailPage extends StatefulWidget {
   final int finalPrice;
   final String paymentUrl;
   final String discount;
-  final String productImage;
-  final int productPrice;
-
-  const OrderDetailPage({
-    Key? key,
-    required this.selectedCarts,
-    required this.totalPrice,
-    required this.paymentUrl,
-    required this.discount,
-    required this.finalPrice,
-    required this.totalDiscount,
-    required this.productImage,
-    required this.productPrice,
-  }) : super(key: key);
+  final List productImages;
+  final List productPrices;
+  final List quantityProducts;
+  const OrderDetailPage(
+      {Key? key,
+      required this.selectedCarts,
+      required this.totalPrice,
+      required this.paymentUrl,
+      required this.discount,
+      required this.finalPrice,
+      required this.totalDiscount,
+      required this.productImages,
+      required this.productPrices,
+      required this.quantityProducts})
+      : super(key: key);
 
   @override
   _OrderDetailPageState createState() => _OrderDetailPageState();
@@ -101,8 +102,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               image: DecorationImage(
-                                image: AssetImage(widget
-                                    .productImage), // Hiển thị ảnh sản phẩm
+                                image: NetworkImage(widget.productImages[
+                                    index]), // Hiển thị ảnh sản phẩm
                               ),
                             ),
                           ),
@@ -129,7 +130,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  'Giá: ${Helpers.formatPrice(widget.productPrice)}',
+                                  'Giá: ${Helpers.formatPrice(widget.productPrices[index] * widget.quantityProducts[index])}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: ColorWidget.primaryColor(),

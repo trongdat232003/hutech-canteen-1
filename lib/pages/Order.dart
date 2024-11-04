@@ -76,7 +76,7 @@ class _OrderState extends State<Order> with SingleTickerProviderStateMixin {
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: 'Đang chờ'),
-            Tab(text: 'Lịch sử'),
+            Tab(text: 'Đã hoàn thành'),
           ],
         ),
       ),
@@ -153,7 +153,7 @@ class OrderCard extends StatelessWidget {
     } else if (status == 'success') {
       statusColor = Colors.green; // New color for success
     } else {
-      statusColor = Colors.grey; // Default color for any other status
+      statusColor = Colors.grey;
     }
 
     return Card(

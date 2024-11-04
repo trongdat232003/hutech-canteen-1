@@ -30,6 +30,30 @@ class ApiShoppingCart {
     }
   }
 
+  Future<dynamic> deleteCart(productId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('metaData');
+      if (token == null) {
+        throw Exception('No token found. Please log in again.');
+      }
+      var metaData = jsonDecode(token);
+      var accessToken = metaData['token']['accessToken'];
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/deleteProductInCart'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': '$accessToken'
+        },
+        body: jsonEncode({'productId': productId}),
+      );
+    } catch (e) {
+      print('Error fetching cart: $e');
+      return {}; // Trả về danh sách rỗng nếu xảy ra lỗi
+    }
+  }
+
   Future<List<dynamic>> getShoppingCarts() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

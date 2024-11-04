@@ -3,7 +3,7 @@ import 'package:currency_formatter/currency_formatter.dart';
 class Helpers {
   static const CurrencyFormat vndSettings = CurrencyFormat(
     code: 'vn',
-    symbol: 'vnđ',
+    symbol: 'đ',
     symbolSide: SymbolSide.right,
     thousandSeparator: '.',
     decimalSeparator: ',',

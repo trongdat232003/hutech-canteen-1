@@ -20,6 +20,10 @@ class InfoUser extends StatelessWidget {
               "Chào, ${userName}",
               style: AppWidget.boldTextLargeFieldStyle(),
             ),
+            Text(
+              "Chúc bạn một ngày tốt lành!",
+              style: AppWidget.descripe(),
+            ),
           ],
         ),
         ClipRRect(

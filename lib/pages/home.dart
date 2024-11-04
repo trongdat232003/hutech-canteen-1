@@ -4,6 +4,7 @@ import 'package:hutech_cateen/Components/CategoryItem.dart';
 import 'package:hutech_cateen/Components/ProductItem.dart';
 import 'package:hutech_cateen/Components/_search.dart';
 import 'package:hutech_cateen/Components/info_user.dart';
+import 'package:hutech_cateen/Components/product_grid.dart';
 import 'package:hutech_cateen/Components/row_title.dart';
 import 'package:hutech_cateen/pages/edit_profile.dart';
 import 'package:hutech_cateen/services/apiCategory.dart';
@@ -23,21 +24,28 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List categoriesImage = [
     "images/drink.png",
-    "images/noodle.png",
-    "images/rice.jpg",
-    "images/snack.png"
+    "images/candies.png",
+    "images/morning-coffee.png",
+    "images/sunsets.png"
   ];
   List categories = [];
   List products = [];
+  List lastProducts = [];
+  List productsByRating = [];
   String userName = '';
   String avatarUrl = '';
-
+  bool isLoadingCategories = true;
+  bool isLoadingProducts = true;
+  bool isLoadingLastProducts = true;
+  bool isLoadingProductsByRating = true;
   @override
   void initState() {
     super.initState();
     _loadUserData();
     fetchCategoriesFromApi();
     fetchProductsFromApi();
+    fetchLastProductFromApi();
+    fetchProductsByRatingFromApi();
   }
 
   void fetchCategoriesFromApi() async {
@@ -47,12 +55,67 @@ class _HomeState extends State<Home> {
 
       setState(() {
         categories = fetchedCategories
-            .map((category) =>
-                {'meal': category['meals'], 'id': category['_id']})
+            .map((category) => {
+                  'meal': category['meals'],
+                  'id': category['_id'],
+                })
             .toList();
+        isLoadingCategories = false;
       });
     } catch (e) {
       print('Error fetching categories: $e');
+      setState(() {
+        isLoadingCategories = false;
+      });
+    }
+  }
+
+  void fetchLastProductFromApi() async {
+    try {
+      ApiProduct apiService = ApiProduct();
+      List<dynamic> fetchedLastProducts = await apiService.getLastProducts();
+
+      setState(() {
+        lastProducts = fetchedLastProducts
+            .map((product) => {
+                  'productName': product['product_name'],
+                  'productID': product['_id'],
+                  'productThumb': product['product_thumb'],
+                  'productPrice': product['product_price'].toString(),
+                })
+            .toList();
+        isLoadingLastProducts = false;
+      });
+    } catch (e) {
+      print('Error fetching last products: $e');
+      setState(() {
+        isLoadingLastProducts = false;
+      });
+    }
+  }
+
+  void fetchProductsByRatingFromApi() async {
+    try {
+      ApiProduct apiService = ApiProduct();
+      List<dynamic> fetchedProductsByRating =
+          await apiService.getProductsSortedByRating();
+
+      setState(() {
+        productsByRating = fetchedProductsByRating
+            .map((product) => {
+                  'productName': product['product_name'],
+                  'productID': product['_id'],
+                  'productThumb': product['product_thumb'],
+                  'productPrice': product['product_price'].toString(),
+                })
+            .toList();
+        isLoadingProductsByRating = false;
+      });
+    } catch (e) {
+      print('Error fetching products by rating: $e');
+      setState(() {
+        isLoadingProductsByRating = false;
+      });
     }
   }
 
@@ -65,12 +128,18 @@ class _HomeState extends State<Home> {
         products = fetchedProducts
             .map((product) => {
                   'productName': product['product_name'],
-                  'productID': product['_id']
+                  'productID': product['_id'],
+                  'productThumb': product['product_thumb'],
+                  'productPrice': product['product_price'].toString(),
                 })
             .toList();
+        isLoadingProducts = false;
       });
     } catch (e) {
       print('Error fetching products: $e');
+      setState(() {
+        isLoadingProducts = false;
+      });
     }
   }
 
@@ -119,119 +188,102 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        margin: const EdgeInsets.only(top: 50, left: 20, right: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InfoUser(
-              userName: userName,
-              avatarUrl: avatarUrl.isNotEmpty
-                  ? avatarUrl // Ensure to include the full URL
-                  : 'images/user.jpg', // Handle empty URL case
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            // ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) => EditProfilePage()),
-            //     );
-            //   },
-            //   child: const Text('Chỉnh sửa hồ sơ'),
-            // ),
-            Search(),
-            const SizedBox(
-              height: 30,
-            ),
-            RowTitle(title: 'Danh mục'),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              children: [
-                Container(
-                  height: 70,
-                  margin: const EdgeInsets.only(right: 15),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: ColorWidget.primaryColor(),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 3,
-                        blurRadius: 10,
-                        offset: const Offset(12, 10),
-                      ),
-                    ],
-                  ),
-                  width: 118,
-                  child: Row(
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.white),
-                        child: const CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          child: Image(image: AssetImage('images/food.png')),
+      body: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.only(top: 50, left: 15, right: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InfoUser(
+                userName: userName,
+                avatarUrl: avatarUrl.isNotEmpty ? avatarUrl : 'images/user.jpg',
+              ),
+              const SizedBox(height: 40),
+              Row(
+                children: [
+                  Container(
+                    height: 70,
+                    margin: const EdgeInsets.only(right: 15),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: ColorWidget.primaryColor(),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 3,
+                          blurRadius: 10,
+                          offset: const Offset(12, 10),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Tất cả',
-                        style: AppWidget.boldTextSmallFieldStyle(),
-                      )
-                    ],
+                      ],
+                    ),
+                    width: 118,
+                    child: Row(
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            child: Image(image: AssetImage('images/food.png')),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Tất cả',
+                          style: AppWidget.boldTextSmallFieldStyle(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 80,
-                    child: (categories.isNotEmpty)
-                        ? ListView.builder(
-                            padding: const EdgeInsets.only(top: 10, bottom: 10),
-                            itemCount: categoriesImage.length,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) {
-                              return CategoryItem(
-                                image: categoriesImage[index],
-                                title: categories[index]['meal'],
-                                categoryID: categories[index]['id'],
-                              );
-                            })
-                        : const Center(child: Text("Không có danh mục nào")),
+                  Expanded(
+                    child: Container(
+                      height: 80,
+                      child: (categories.isNotEmpty)
+                          ? ListView.builder(
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              itemCount: categoriesImage.length,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return CategoryItem(
+                                  image: categoriesImage[index],
+                                  title: categories[index]['meal'],
+                                  categoryID: categories[index]['id'],
+                                );
+                              })
+                          : const Center(child: Text("Không có danh mục nào")),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            RowTitle(title: 'Tất cả sản phẩm'),
-            const SizedBox(height: 80),
-            Container(
-              margin: const EdgeInsets.only(left: 10),
-              height: 130,
-              child: (products.isNotEmpty)
-                  ? ListView.builder(
-                      clipBehavior: Clip.none,
-                      shrinkWrap: true,
-                      itemCount: products.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return ProductItem(
-                          image: 'images/pho.png',
-                          title: products[index]['productName'],
-                          productID: products[index]['productID'],
-                        );
-                      })
-                  : const Center(child: Text("Không có sản phẩm nào")),
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              isLoadingProductsByRating
+                  ? Center(child: CircularProgressIndicator())
+                  : ProductGrid(
+                      title: 'Sản phẩm được đánh giá cao',
+                      products: productsByRating,
+                    ),
+              const SizedBox(height: 20),
+              isLoadingLastProducts
+                  ? Center(child: CircularProgressIndicator())
+                  : ProductGrid(
+                      title: 'Sản phẩm mới nhất',
+                      products: lastProducts,
+                    ),
+              const SizedBox(height: 20),
+              isLoadingProducts
+                  ? Center(child: CircularProgressIndicator())
+                  : ProductGrid(
+                      title: 'Tất cả sản phẩm',
+                      products: products,
+                    ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

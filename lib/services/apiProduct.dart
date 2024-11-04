@@ -24,6 +24,45 @@ class ApiProduct {
     }
   }
 
+  Future<List<dynamic>> getLastProducts() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/getLatestProducts'),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var products = data['metaData'];
+
+        return products;
+      } else {
+        throw Exception('Failed to load Product');
+      }
+    } catch (e) {
+      print('Error fetching Product: $e');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getProductsSortedByRating() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/getProductsSortedByRating'),
+      );
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var products = data['metaData'];
+        return products;
+      } else {
+        throw Exception('Failed to load Product');
+      }
+    } catch (e) {
+      print('Error fetching Product: $e');
+      return [];
+    }
+  }
+
   Future<dynamic> getProductByID(productID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('metaData');
