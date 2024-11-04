@@ -36,20 +36,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (metaDataString != null) {
       print("User data found: $metaDataString");
-      // Update user info in state
       final responseData = jsonDecode(metaDataString);
-      print(responseData);
       setState(() {
         name = responseData['user']['name'];
         email = responseData['user']['email'];
         _nameController.text = name ?? '';
-        avatarUrl = responseData['user']['avatar'] != null
-            ? 'http://10.0.2.2:3000/${responseData['user']['avatar']}'
-            : '';
+        avatarUrl = responseData['user']['avatar'];
+        print("helooooooooooooooooooooooo" + avatarUrl);
       });
     } else {
       print("No user data found in SharedPreferences.");
-      // Handle case when no data is found
     }
   }
 

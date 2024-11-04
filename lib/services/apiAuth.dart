@@ -120,12 +120,36 @@ class ApiAuth {
     return true;
   }
 
+  Future<String?> _uploadToCloudinary(File imageFile) async {
+    final cloudinaryUrl =
+        'https://api.cloudinary.com/v1_1/dluwhbsel/image/upload';
+    final uploadPreset = 'flutter';
+
+    final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl))
+      ..fields['upload_preset'] = uploadPreset
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+    final response = await request.send();
+    final responseString = await http.Response.fromStream(response);
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${responseString.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(responseString.body);
+      print(responseData);
+      return responseData['secure_url']; // URL Cloudinary của ảnh đã tải lên
+    } else {
+      print('Không thể tải lên Cloudinary: ${response.statusCode}');
+      return null;
+    }
+  }
+
   Future<bool> editProfile(String name, File? imageFile) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? metaDataString = prefs.getString('metaData');
 
     if (metaDataString == null) {
-      print('No user data found in SharedPreferences.');
+      print('Không tìm thấy dữ liệu người dùng trong SharedPreferences.');
       return false;
     }
 
@@ -133,50 +157,49 @@ class ApiAuth {
     try {
       metaData = jsonDecode(metaDataString);
     } catch (e) {
-      print('Cannot parse metaData: $e');
+      print('Không thể phân tích metaData: $e');
       return false;
     }
 
     String? accessToken = metaData['token']['accessToken'];
-    String? refreshToken = metaData['token']['refreshToken'];
 
-    // Kiểm tra token có hợp lệ không
     if (accessToken == null) {
-      print('Access token is null.');
+      print('Access token bị null.');
       return false;
+    }
+
+    String? cloudinaryUrl;
+    if (imageFile != null) {
+      cloudinaryUrl = await _uploadToCloudinary(imageFile);
+      if (cloudinaryUrl == null) {
+        print('Không tải được ảnh lên Cloudinary');
+        return false;
+      }
     }
 
     try {
       var request =
           http.MultipartRequest('PATCH', Uri.parse('$baseUrl/updatePr'));
-      request.fields['name'] = name; // Thêm tên vào request
-
-      // Nếu có hình ảnh thì thêm hình vào request
-      if (imageFile != null) {
-        print('Image path: ${imageFile.path}'); // In đường dẫn hình ảnh
-        request.files
-            .add(await http.MultipartFile.fromPath('avatar', imageFile.path));
+      request.fields['name'] = name;
+      if (cloudinaryUrl != null) {
+        request.fields['avatar'] = cloudinaryUrl; // Lưu URL Cloudinary
       }
 
-      // Thêm header với token
-      request.headers['Authorization'] =
-          '$accessToken'; // Đảm bảo thêm 'Bearer'
+      request.headers['Authorization'] = '$accessToken';
 
-      // Gửi yêu cầu và đọc phản hồi
       var response = await request.send();
       final responseString = await http.Response.fromStream(response);
 
-      // Kiểm tra trạng thái phản hồi
       if (response.statusCode == 200) {
-        print('Profile updated successfully: ${responseString.body}');
+        print('Cập nhật hồ sơ thành công: ${responseString.body}');
         return true;
       } else {
         print(
-            'Failed to update profile: ${response.statusCode} - ${responseString.body}');
+            'Lỗi khi cập nhật hồ sơ: ${response.statusCode} - ${responseString.body}');
         return false;
       }
     } catch (e) {
-      print('Error: $e');
+      print('Lỗi: $e');
       return false;
     }
   }
