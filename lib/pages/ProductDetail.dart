@@ -203,127 +203,134 @@ class _ProductDetailState extends State<ProductDetail> {
                 ),
               ),
             ),
-            body: Stack(
+            body: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20,
-                      right: 25,
-                      left: 25,
-                      bottom: 80), // Thay đổi padding dưới để tránh che khuất
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 200,
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: ColorWidget.primaryColor(),
-                          borderRadius: BorderRadius.circular(40),
-                        ),
-                        child: Image.network(
-                          product!['product'][
-                              'product_thumb'], // Thay thế bằng hình ảnh của bạn
-                          height: 180,
-                          width: 180,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 20, right: 25, left: 25, bottom: 80),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            product!['product']['product_name'],
-                            style: AppWidget.boldTextLargeFieldStyle(),
+                          // Product Image and Details
+                          Container(
+                            width: double.infinity,
+                            height: 200,
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: ColorWidget.primaryColor(),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: Image.network(
+                              product!['product']['product_thumb'],
+                              height: 180,
+                              width: 180,
+                            ),
                           ),
+                          SizedBox(height: 16),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                  product!['product']['product_ratingAverage']
-                                      .toString(),
-                                  style: AppWidget.boldTextSmallFieldStyle()),
-                              SizedBox(width: 4),
-                              Icon(Icons.star, color: Colors.orange, size: 20),
+                                product!['product']['product_name'],
+                                style: AppWidget.boldTextLargeFieldStyle(),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    product!['product']['product_ratingAverage']
+                                        .toString(),
+                                    style: AppWidget.boldTextSmallFieldStyle(),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.star,
+                                      color: Colors.orange, size: 20),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        product!['product']['product_description'],
-                        style: AppWidget.descripe(),
-                      ),
-                      SizedBox(height: 10),
-                      Row(children: [
-                        Text(
-                          "Số lượng hàng trong kho:",
-                          style: AppWidget.boldTextMediumFieldStyle(),
-                        ),
-                        SizedBox(width: 10),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: ColorWidget.inputColor(),
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            inventory!['inven_stock'].toString(),
-                            style: AppWidget.descripeStrong(),
+                          SizedBox(height: 8),
+                          Text(
+                            product!['product']['product_description'],
+                            style: AppWidget.descripe(),
                           ),
-                        ),
-                      ]),
-                      Row(children: [
-                        Text(
-                          "Số lượng:",
-                          style: AppWidget.boldTextMediumFieldStyle(),
-                        ),
-                        SizedBox(width: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: ColorWidget.inputColor(),
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            product!['product']['serving_size'],
-                            style: AppWidget.descripeStrong(),
+                          SizedBox(height: 10),
+                          // Additional Product Details
+                          Row(children: [
+                            Text(
+                              "Số lượng hàng trong kho:",
+                              style: AppWidget.boldTextMediumFieldStyle(),
+                            ),
+                            SizedBox(width: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: ColorWidget.inputColor(),
+                                  borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                inventory!['inven_stock'].toString(),
+                                style: AppWidget.descripeStrong(),
+                              ),
+                            ),
+                          ]),
+                          Row(children: [
+                            Text(
+                              "Số lượng:",
+                              style: AppWidget.boldTextMediumFieldStyle(),
+                            ),
+                            SizedBox(width: 16),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: ColorWidget.inputColor(),
+                                  borderRadius: BorderRadius.circular(30)),
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                product!['product']['serving_size'],
+                                style: AppWidget.descripeStrong(),
+                              ),
+                            ),
+                          ]),
+                          SizedBox(height: 10),
+                          Text(
+                            "Cách sử dụng :",
+                            style: AppWidget.boldTextMediumFieldStyle(),
                           ),
-                        ),
-                      ]),
-                      SizedBox(height: 10),
-                      Text(
-                        "Cách sử dụng :",
-                        style: AppWidget.boldTextMediumFieldStyle(),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        product!['product']['product_usage'],
-                        style: AppWidget.descripe(),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        "Nguyên Liệu :",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[800],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(product!['product']['ingredients'],
-                          style: AppWidget.descripe()),
-                      Spacer(),
-                      Text('Đánh giá của khách hàng:'),
-                      Container(
-                        child: reviews.length > 0
-                            ? Expanded(
-                                child: ListView.builder(
+                          SizedBox(height: 8),
+                          Text(
+                            product!['product']['product_usage'],
+                            style: AppWidget.descripe(),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            "Nguyên Liệu :",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            product!['product']['ingredients'],
+                            style: AppWidget.descripe(),
+                          ),
+                          SizedBox(height: 20),
+                          // Reviews Section
+                          Text(
+                            'Đánh giá của khách hàng:',
+                            style: AppWidget.boldTextMediumFieldStyle(),
+                          ),
+                          reviews.isNotEmpty
+                              ? ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
                                   itemCount: reviews.length,
                                   itemBuilder: (context, index) {
                                     final review = reviews[index];
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0, vertical: 0),
+                                          horizontal: 10.0, vertical: 8),
                                       child: Card(
                                         color: Colors.white,
                                         elevation: 3,
@@ -337,21 +344,14 @@ class _ProductDetailState extends State<ProductDetail> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  CircleAvatar(
-                                                    backgroundImage: avatarUrl
-                                                            .isNotEmpty
-                                                        ? NetworkImage(
-                                                            avatarUrl)
-                                                        : AssetImage(
-                                                                'images/user.png')
-                                                            as ImageProvider,
-                                                    radius: 25,
-                                                  ),
-                                                ],
+                                              CircleAvatar(
+                                                backgroundImage: avatarUrl
+                                                        .isNotEmpty
+                                                    ? NetworkImage(avatarUrl)
+                                                    : AssetImage(
+                                                            'images/user.png')
+                                                        as ImageProvider,
+                                                radius: 25,
                                               ),
                                               const SizedBox(width: 10),
                                               Expanded(
@@ -360,7 +360,7 @@ class _ProductDetailState extends State<ProductDetail> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      userName, // Thay đổi theo review['productName']
+                                                      userName,
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -411,76 +411,68 @@ class _ProductDetailState extends State<ProductDetail> {
                                       ),
                                     );
                                   },
-                                ),
-                              )
-                            : EmptyScreen(
-                                title: 'Bạn chưa đánh giá sản phẩm nào',
-                                desc:
-                                    'Trở về bên chưa đánh giá để đánh giá sản phẩm'),
-                      )
-                    ],
+                                )
+                              : EmptyScreen(
+                                  title: 'Bạn chưa đánh giá sản phẩm nào',
+                                  desc:
+                                      'Trở về bên chưa đánh giá để đánh giá sản phẩm'),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: ColorWidget.inputColor(),
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(30))),
-                    padding: EdgeInsets.only(
-                        right: 24,
-                        left: 24,
-                        bottom: 40,
-                        top: 30), // Padding cho nội dung bên trong
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              Helpers.formatPrice(
-                                  product!['product']['product_price']),
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[800],
-                              ),
+                // Add to Cart Section (fixed at the bottom)
+                Container(
+                  decoration: BoxDecoration(
+                      color: ColorWidget.inputColor(),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(30))),
+                  padding:
+                      EdgeInsets.only(right: 24, left: 24, bottom: 40, top: 30),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            Helpers.formatPrice(
+                                product!['product']['product_price']),
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
                             ),
-                            QuantityControl(
-                                quantity: selectedQuantity,
-                                maxInventory: maxInventory,
-                                onQuantityChanged: updateQuantity),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              fetchAddToCart(
-                                  widget.productID, selectedQuantity);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorWidget.primaryColor(),
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          ),
+                          QuantityControl(
+                              quantity: selectedQuantity,
+                              maxInventory: maxInventory,
+                              onQuantityChanged: updateQuantity),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            fetchAddToCart(widget.productID, selectedQuantity);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorWidget.primaryColor(),
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Text(
-                              "Thêm vào giỏ hàng",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
+                          ),
+                          child: Text(
+                            "Thêm vào giỏ hàng",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
